@@ -4,17 +4,19 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { DataService } from '../../services/data.service';
 import { Project } from '../../models/project.model';
+import { RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-projects',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, RouterModule],
   templateUrl: './projects.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export default class ProjectsComponent {
   dataService = inject(DataService);
-  private fb = inject(FormBuilder);
+  // FIX: Explicitly type `fb` to resolve TypeScript's incorrect type inference.
+  private fb: FormBuilder = inject(FormBuilder);
   
   projects = this.dataService.projects;
   isModalOpen = signal(false);
@@ -102,11 +104,5 @@ export default class ProjectsComponent {
       this.dataService.addProject(projectData);
     }
     this.closeModal();
-  }
-
-  deleteProject(id: string) {
-    if(confirm('Are you sure you want to delete this project? This will unassign it from all entries.')) {
-        this.dataService.deleteProject(id);
-    }
   }
 }

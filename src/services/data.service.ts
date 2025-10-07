@@ -45,8 +45,8 @@ export class DataService {
   }
 
   deleteProject(id: string) {
-    // Also unassign from entries
-    this.entries.update(entries => entries.map(e => e.projectId === id ? {...e, projectId: undefined} : e));
+    // Also delete associated entries
+    this.entries.update(entries => entries.filter(e => e.projectId !== id));
     this.projects.update(projects => projects.filter(p => p.id !== id));
   }
   

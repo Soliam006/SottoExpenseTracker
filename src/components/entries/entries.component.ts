@@ -13,7 +13,8 @@ import { Entry } from '../../models/entry.model';
 })
 export default class EntriesComponent {
   dataService = inject(DataService);
-  private fb = inject(FormBuilder);
+  // FIX: Explicitly type `fb` to resolve TypeScript's incorrect type inference.
+  private fb: FormBuilder = inject(FormBuilder);
 
   entries = this.dataService.entries;
   projects = this.dataService.projects;

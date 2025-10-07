@@ -7,7 +7,17 @@ export const routes: Routes = [
   },
   {
     path: 'projects',
-    loadComponent: () => import('./components/projects/projects.component'),
+    children: [
+      {
+        path: '',
+        loadComponent: () => import('./components/projects/projects.component'),
+        pathMatch: 'full'
+      },
+      {
+        path: ':id',
+        loadComponent: () => import('./components/project-detail/project-detail.component'),
+      }
+    ]
   },
   {
     path: 'calendar',

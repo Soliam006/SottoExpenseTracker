@@ -1,4 +1,3 @@
-
 <div class="p-4 sm:p-6 lg:p-8">
   <div class="flex justify-between items-center mb-6">
     <h2 class="text-2xl font-bold text-gray-800">Projects</h2>
@@ -17,7 +16,7 @@
   } @else {
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       @for (project of projects(); track project.id) {
-        <div class="bg-white rounded-lg shadow-lg overflow-hidden transform hover:-translate-y-1 transition-transform duration-300">
+        <a [routerLink]="['/projects', project.id]" class="block bg-white rounded-lg shadow-lg overflow-hidden transform hover:-translate-y-1 transition-transform duration-300">
           @if (project.imageUrl) {
             <img [src]="project.imageUrl" [alt]="project.name" class="h-48 w-full object-cover">
           } @else {
@@ -31,13 +30,9 @@
             <h3 class="text-xl font-semibold text-gray-900 mb-2">{{ project.name }}</h3>
             <p class="text-gray-600 mb-1"><span class="font-medium">Client:</span> {{ project.client }}</p>
             <p class="text-gray-600 mb-1"><span class="font-medium">Address:</span> {{ project.address }}</p>
-            <p class="text-gray-600 mb-4"><span class="font-medium">Mobile:</span> {{ project.mobile }}</p>
-            <div class="flex justify-end space-x-2 border-t pt-4">
-              <button (click)="openModal(project)" class="text-indigo-600 hover:text-indigo-800 font-medium">Edit</button>
-              <button (click)="deleteProject(project.id)" class="text-red-600 hover:text-red-800 font-medium">Delete</button>
-            </div>
+            <p class="text-gray-600"><span class="font-medium">Mobile:</span> {{ project.mobile }}</p>
           </div>
-        </div>
+        </a>
       }
     </div>
   }
