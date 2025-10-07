@@ -22,7 +22,7 @@ interface EnrichedEntry extends Entry {
   templateUrl: './calendar.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class CalendarComponent {
+export default class CalendarComponent {
   dataService = inject(DataService);
   
   viewDate = signal(new Date());

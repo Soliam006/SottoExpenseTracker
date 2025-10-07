@@ -11,7 +11,7 @@ import { Entry } from '../../models/entry.model';
   templateUrl: './entries.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class EntriesComponent {
+export default class EntriesComponent {
   dataService = inject(DataService);
   private fb = inject(FormBuilder);
 

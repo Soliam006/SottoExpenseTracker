@@ -12,7 +12,7 @@ import { Project } from '../../models/project.model';
   templateUrl: './projects.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ProjectsComponent {
+export default class ProjectsComponent {
   dataService = inject(DataService);
   private fb = inject(FormBuilder);
   

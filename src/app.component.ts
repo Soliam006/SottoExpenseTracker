@@ -1,10 +1,8 @@
 
-import { Component, ChangeDetectionStrategy, signal } from '@angular/core';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { HeaderComponent, View } from './components/header/header.component';
-import { ProjectsComponent } from './components/projects/projects.component';
-import { EntriesComponent } from './components/entries/entries.component';
-import { CalendarComponent } from './components/calendar/calendar.component';
+import { HeaderComponent } from './components/header/header.component';
+import { RouterOutlet } from '@angular/router';
 
 @Component({
   selector: 'app-root',
@@ -12,17 +10,10 @@ import { CalendarComponent } from './components/calendar/calendar.component';
   imports: [
     CommonModule,
     HeaderComponent,
-    ProjectsComponent,
-    EntriesComponent,
-    CalendarComponent
+    RouterOutlet
   ],
   templateUrl: './app.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AppComponent {
-  activeView = signal<View>('entries');
-
-  onViewChange(view: View) {
-    this.activeView.set(view);
-  }
 }
