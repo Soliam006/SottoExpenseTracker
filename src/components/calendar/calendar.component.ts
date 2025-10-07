@@ -1,7 +1,7 @@
-
 import { Component, ChangeDetectionStrategy, signal, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DataService } from '../../services/data.service';
+import { Entry } from '../../models/entry.model';
 
 interface CalendarDay {
   date: Date;
@@ -9,6 +9,10 @@ interface CalendarDay {
   isCurrentMonth: boolean;
   isToday: boolean;
   totalExpense: number;
+}
+
+interface EnrichedEntry extends Entry {
+  projectName: string;
 }
 
 @Component({
@@ -22,6 +26,11 @@ export class CalendarComponent {
   dataService = inject(DataService);
   
   viewDate = signal(new Date());
+  
+  // Modal state
+  isModalOpen = signal(false);
+  modalDate = signal<Date | null>(null);
+  modalEntries = signal<EnrichedEntry[]>([]);
   
   daysOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
@@ -84,5 +93,37 @@ export class CalendarComponent {
       newDate.setMonth(d.getMonth() + offset);
       return newDate;
     });
+  }
+
+  openDayModal(day: CalendarDay) {
+    if (day.totalExpense === 0) {
+      return; // Do nothing if there are no entries
+    }
+    
+    this.modalDate.set(day.date);
+
+    const projects = this.dataService.projects();
+    const entries = this.dataService.entries();
+
+    const year = day.date.getFullYear();
+    const month = (day.date.getMonth() + 1).toString().padStart(2, '0');
+    const dayOfMonth = day.date.getDate().toString().padStart(2, '0');
+    const ymd = `${year}-${month}-${dayOfMonth}`;
+
+    const dayEntries = entries
+      .filter(entry => entry.date === ymd)
+      .map(entry => ({
+        ...entry,
+        projectName: projects.find(p => p.id === entry.projectId)?.name || 'N/A'
+      }));
+      
+    this.modalEntries.set(dayEntries);
+    this.isModalOpen.set(true);
+  }
+
+  closeModal() {
+    this.isModalOpen.set(false);
+    this.modalDate.set(null);
+    this.modalEntries.set([]);
   }
 }

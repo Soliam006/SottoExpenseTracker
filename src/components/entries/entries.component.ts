@@ -1,4 +1,3 @@
-
 import { Component, ChangeDetectionStrategy, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
@@ -20,7 +19,7 @@ export class EntriesComponent {
   projects = this.dataService.projects;
   isModalOpen = signal(false);
   editingEntry = signal<Entry | null>(null);
-  receiptImagePreview = signal<string | null>(null);
+  receiptImagePreviews = signal<string[]>([]);
 
   // Filters
   filterType = signal<'all' | 'receipt' | 'expense'>('all');
@@ -64,7 +63,6 @@ export class EntriesComponent {
     price: [0, [Validators.required, Validators.min(0.01)]],
     projectId: [''],
     description: ['', Validators.required],
-    receiptImage: [''],
   });
 
   get isReceipt() {
@@ -81,7 +79,7 @@ export class EntriesComponent {
 
   openModal(entry: Entry | null = null) {
     this.editingEntry.set(entry);
-    this.receiptImagePreview.set(null);
+    this.receiptImagePreviews.set([]);
     if (entry) {
       this.entryForm.patchValue({
         type: entry.type,
@@ -89,10 +87,9 @@ export class EntriesComponent {
         price: entry.price,
         projectId: entry.projectId || '',
         description: entry.description,
-        receiptImage: '' // Do not pre-fill file input
       });
-      if (entry.receiptImage) {
-        this.receiptImagePreview.set(entry.receiptImage);
+      if (entry.receiptImages) {
+        this.receiptImagePreviews.set(entry.receiptImages);
       }
     } else {
       this.entryForm.reset({
@@ -101,7 +98,6 @@ export class EntriesComponent {
         price: 0,
         projectId: '',
         description: '',
-        receiptImage: ''
       });
     }
     this.isModalOpen.set(true);
@@ -111,20 +107,43 @@ export class EntriesComponent {
     this.isModalOpen.set(false);
     this.editingEntry.set(null);
     this.entryForm.reset();
+    this.receiptImagePreviews.set([]);
   }
 
-  onFileChange(event: Event) {
+  async onFileChange(event: Event) {
     const input = event.target as HTMLInputElement;
-    if (input.files && input.files[0]) {
-      const file = input.files[0];
-      const reader = new FileReader();
-      reader.onload = () => {
-        const base64String = reader.result as string;
-        this.entryForm.patchValue({ receiptImage: base64String });
-        this.receiptImagePreview.set(base64String);
-      };
-      reader.readAsDataURL(file);
+    if (!input.files) return;
+
+    const files = Array.from(input.files);
+    const currentImages = this.receiptImagePreviews();
+
+    if (files.length + currentImages.length > 3) {
+      alert('You can upload a maximum of 3 images.');
+      input.value = ''; // Clear file input
+      return;
     }
+
+    const readAsDataURL = (file: File): Promise<string> => {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result as string);
+        reader.onerror = error => reject(error);
+        reader.readAsDataURL(file);
+      });
+    };
+
+    try {
+      const base64strings = await Promise.all(files.map(readAsDataURL));
+      this.receiptImagePreviews.update(previews => [...previews, ...base64strings]);
+    } catch (error) {
+      console.error('Error reading files:', error);
+    } finally {
+        input.value = '';
+    }
+  }
+  
+  removeImage(indexToRemove: number) {
+    this.receiptImagePreviews.update(previews => previews.filter((_, index) => index !== indexToRemove));
   }
 
   saveEntry() {
@@ -138,20 +157,15 @@ export class EntriesComponent {
         price: formValue.price!,
         projectId: formValue.projectId! === '' ? undefined : formValue.projectId!,
         description: formValue.description!,
-        receiptImage: formValue.receiptImage || undefined,
+        receiptImages: this.receiptImagePreviews(),
     };
     
-    // If not a receipt, clear image
     if (entryData.type !== 'receipt') {
-        entryData.receiptImage = undefined;
+        entryData.receiptImages = [];
     }
 
     const currentEntry = this.editingEntry();
     if (currentEntry) {
-        // If user didn't upload a new image while editing, keep the old one.
-        if (!entryData.receiptImage && currentEntry.receiptImage) {
-            entryData.receiptImage = currentEntry.receiptImage;
-        }
       this.dataService.updateEntry({ ...entryData, id: currentEntry.id });
     } else {
       this.dataService.addEntry(entryData);

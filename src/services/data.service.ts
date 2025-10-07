@@ -1,4 +1,3 @@
-
 import { Injectable, signal } from '@angular/core';
 import { Project } from '../models/project.model';
 import { Entry } from '../models/entry.model';
@@ -18,9 +17,9 @@ export class DataService {
     ]);
 
     this.entries.set([
-      { id: 'entry1', type: 'receipt', date: this.getYMD(new Date()), price: 125.50, projectId: 'proj1', description: 'Lumber purchase', receiptImage: '' },
+      { id: 'entry1', type: 'receipt', date: this.getYMD(new Date()), price: 125.50, projectId: 'proj1', description: 'Lumber purchase', receiptImages: [] },
       { id: 'entry2', type: 'expense', date: this.getYMD(new Date(), -2), price: 45.00, projectId: 'proj2', description: 'Client Lunch' },
-      { id: 'entry3', type: 'receipt', date: this.getYMD(new Date(), -5), price: 850.00, projectId: 'proj1', description: 'Window fixtures', receiptImage: '' },
+      { id: 'entry3', type: 'receipt', date: this.getYMD(new Date(), -5), price: 850.00, projectId: 'proj1', description: 'Window fixtures', receiptImages: [] },
     ]);
   }
   
