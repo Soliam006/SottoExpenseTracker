@@ -1,4 +1,3 @@
-
 import { Component, ChangeDetectionStrategy, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
@@ -21,15 +20,41 @@ export class EntriesComponent {
   isModalOpen = signal(false);
   editingEntry = signal<Entry | null>(null);
   receiptImagePreview = signal<string | null>(null);
+
+  // Filters
+  filterType = signal<'all' | 'receipt' | 'expense'>('all');
+  filterProject = signal<string>('all');
+  filterMonth = signal<string>('all');
+
+  availableMonths = computed(() => {
+    const entries = this.dataService.entries();
+    const months = new Set<string>();
+    entries.forEach(entry => {
+      const month = entry.date.substring(0, 7); // 'YYYY-MM'
+      months.add(month);
+    });
+    return Array.from(months).sort().reverse();
+  });
   
   // Use a computed signal for enriched entries with project names
   enrichedEntries = computed(() => {
     const entries = this.entries();
     const projects = this.projects();
-    return entries.map(entry => ({
-      ...entry,
-      projectName: projects.find(p => p.id === entry.projectId)?.name || 'N/A'
-    })).sort((a,b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+    const type = this.filterType();
+    const projectId = this.filterProject();
+    const month = this.filterMonth();
+
+    return entries.filter(entry => {
+        const typeMatch = type === 'all' || entry.type === type;
+        const projectMatch = projectId === 'all' || entry.projectId === projectId;
+        const monthMatch = month === 'all' || entry.date.startsWith(month);
+        return typeMatch && projectMatch && monthMatch;
+      })
+      .map(entry => ({
+        ...entry,
+        projectName: projects.find(p => p.id === entry.projectId)?.name || 'N/A'
+      }))
+      .sort((a,b) => new Date(b.date).getTime() - new Date(a.date).getTime());
   });
 
   entryForm = this.fb.group({
@@ -133,5 +158,11 @@ export class EntriesComponent {
     if(confirm('Are you sure you want to delete this entry?')) {
         this.dataService.deleteEntry(id);
     }
+  }
+
+  formatMonth(month: string): string {
+    const [year, monthNum] = month.split('-');
+    const date = new Date(Number(year), Number(monthNum) - 1);
+    return date.toLocaleString('default', { month: 'long', year: 'numeric' });
   }
 }
