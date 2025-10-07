@@ -46,7 +46,11 @@ export class CalendarComponent {
     today.setHours(0,0,0,0);
 
     while (currentDate <= endDate) {
-      const ymd = currentDate.toISOString().split('T')[0];
+      const year = currentDate.getFullYear();
+      const monthStr = (currentDate.getMonth() + 1).toString().padStart(2, '0');
+      const dayStr = currentDate.getDate().toString().padStart(2, '0');
+      const ymd = `${year}-${monthStr}-${dayStr}`;
+
       const dailyEntries = entries.filter(e => e.date === ymd);
       const totalExpense = dailyEntries.reduce((sum, e) => sum + e.price, 0);
       
