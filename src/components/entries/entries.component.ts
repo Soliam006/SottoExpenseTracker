@@ -57,6 +57,10 @@ export default class EntriesComponent {
       .sort((a,b) => new Date(b.date).getTime() - new Date(a.date).getTime());
   });
 
+  filteredTotal = computed(() => {
+    return this.enrichedEntries().reduce((total, entry) => total + entry.price, 0);
+  });
+
   entryForm = this.fb.group({
     type: ['receipt' as 'receipt' | 'expense', Validators.required],
     date: [this.getTodayString(), Validators.required],

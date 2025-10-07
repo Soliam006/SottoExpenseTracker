@@ -9,7 +9,7 @@
 
   <!-- Filter Section -->
   <div class="mb-6 bg-white p-4 rounded-lg shadow-md">
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
       <div>
         <label for="filter-type" class="block text-sm font-medium text-gray-700">Filter by Type</label>
         <select id="filter-type" (change)="filterType.set($any($event.target).value)" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
@@ -35,6 +35,10 @@
             <option [value]="month">{{ formatMonth(month) }}</option>
           }
         </select>
+      </div>
+      <div class="text-right">
+        <label class="block text-sm font-medium text-gray-700">Filtered Total</label>
+        <p class="text-2xl font-bold text-indigo-600 mt-1">{{ filteredTotal() | currency }}</p>
       </div>
     </div>
   </div>
