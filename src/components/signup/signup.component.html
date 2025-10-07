@@ -1,0 +1,41 @@
+<div class="flex items-center justify-center min-h-screen bg-gray-100">
+  <div class="w-full max-w-md p-8 space-y-6 bg-white rounded-lg shadow-md">
+    <div class="text-center">
+      <h2 class="text-3xl font-bold text-gray-900">Create a new account</h2>
+      <p class="mt-2 text-sm text-gray-600">
+        Or <a routerLink="/login" class="font-medium text-indigo-600 hover:text-indigo-500">log in to your existing account</a>
+      </p>
+    </div>
+    <form class="space-y-6" [formGroup]="signupForm" (ngSubmit)="signup()">
+      <div>
+        <label for="email" class="block text-sm font-medium text-gray-700">Email address</label>
+        <div class="mt-1">
+          <input id="email" name="email" type="email" autocomplete="email" required formControlName="email"
+                 class="block w-full px-3 py-2 placeholder-gray-400 border border-gray-300 rounded-md shadow-sm appearance-none focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+        </div>
+      </div>
+
+      <div>
+        <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
+        <div class="mt-1">
+          <input id="password" name="password" type="password" autocomplete="new-password" required formControlName="password"
+                 class="block w-full px-3 py-2 placeholder-gray-400 border border-gray-300 rounded-md shadow-sm appearance-none focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+        </div>
+        @if(signupForm.get('password')?.hasError('minlength')) {
+          <p class="mt-2 text-sm text-red-600">Password must be at least 6 characters long.</p>
+        }
+      </div>
+
+      @if (errorMessage()) {
+        <p class="text-sm text-red-600">{{ errorMessage() }}</p>
+      }
+
+      <div>
+        <button type="submit" [disabled]="signupForm.invalid"
+                class="flex justify-center w-full px-4 py-2 text-sm font-medium text-white bg-indigo-600 border border-transparent rounded-md shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:bg-indigo-300">
+          Create account
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

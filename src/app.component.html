@@ -1,8 +1,10 @@
 <div class="min-h-screen">
-  <app-header />
+  @if(authService.currentUser()) {
+    <app-header />
+  }
   
   <main>
-    <div class="max-w-7xl mx-auto">
+    <div [class]="authService.currentUser() ? 'max-w-7xl mx-auto' : ''">
       <router-outlet></router-outlet>
     </div>
   </main>

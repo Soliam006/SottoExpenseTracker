@@ -1,6 +1,7 @@
-import { Component, ChangeDetectionStrategy, signal } from '@angular/core';
+import { Component, ChangeDetectionStrategy, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink, RouterLinkActive } from '@angular/router';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-header',
@@ -18,34 +19,38 @@ import { RouterLink, RouterLinkActive } from '@angular/router';
           <h1 class="text-xl font-bold">Construction Expense Tracker</h1>
         </div>
         
-        <!-- Desktop Nav -->
-        <nav class="hidden md:flex items-center">
-          <a routerLink="/entries" routerLinkActive="bg-gray-900 text-white" [routerLinkActiveOptions]="{exact: true}" class="px-3 py-2 rounded-md text-sm font-medium transition-colors text-gray-300 hover:bg-gray-700 hover:text-white">Entries</a>
-          <a routerLink="/projects" routerLinkActive="bg-gray-900 text-white" class="ml-4 px-3 py-2 rounded-md text-sm font-medium transition-colors text-gray-300 hover:bg-gray-700 hover:text-white">Projects</a>
-          <a routerLink="/calendar" routerLinkActive="bg-gray-900 text-white" class="ml-4 px-3 py-2 rounded-md text-sm font-medium transition-colors text-gray-300 hover:bg-gray-700 hover:text-white">Calendar</a>
-        </nav>
-        
-        <!-- Mobile Menu Button -->
-        <div class="md:hidden">
-          <button (click)="toggleMobileMenu()" class="text-gray-300 hover:text-white focus:outline-none p-2 rounded-md">
-            <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              @if (!isMobileMenuOpen()) {
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-              } @else {
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-              }
-            </svg>
-          </button>
-        </div>
+        @if(authService.currentUser()) {
+          <!-- Desktop Nav -->
+          <nav class="hidden md:flex items-center">
+            <a routerLink="/entries" routerLinkActive="bg-gray-900 text-white" [routerLinkActiveOptions]="{exact: true}" class="px-3 py-2 rounded-md text-sm font-medium transition-colors text-gray-300 hover:bg-gray-700 hover:text-white">Entries</a>
+            <a routerLink="/projects" routerLinkActive="bg-gray-900 text-white" class="ml-4 px-3 py-2 rounded-md text-sm font-medium transition-colors text-gray-300 hover:bg-gray-700 hover:text-white">Projects</a>
+            <a routerLink="/calendar" routerLinkActive="bg-gray-900 text-white" class="ml-4 px-3 py-2 rounded-md text-sm font-medium transition-colors text-gray-300 hover:bg-gray-700 hover:text-white">Calendar</a>
+            <button (click)="logout()" class="ml-4 px-3 py-2 rounded-md text-sm font-medium transition-colors text-white bg-indigo-600 hover:bg-indigo-700">Logout</button>
+          </nav>
+          
+          <!-- Mobile Menu Button -->
+          <div class="md:hidden">
+            <button (click)="toggleMobileMenu()" class="text-gray-300 hover:text-white focus:outline-none p-2 rounded-md">
+              <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                @if (!isMobileMenuOpen()) {
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                } @else {
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                }
+              </svg>
+            </button>
+          </div>
+        }
       </div>
 
       <!-- Mobile Nav -->
-      @if (isMobileMenuOpen()) {
+      @if (isMobileMenuOpen() && authService.currentUser()) {
         <nav class="md:hidden bg-gray-800 border-t border-gray-700">
           <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
             <a (click)="closeMobileMenu()" routerLink="/entries" routerLinkActive="bg-gray-900 text-white" [routerLinkActiveOptions]="{exact: true}" class="w-full text-left block px-3 py-2 rounded-md text-base font-medium transition-colors text-gray-300 hover:bg-gray-700 hover:text-white">Entries</a>
             <a (click)="closeMobileMenu()" routerLink="/projects" routerLinkActive="bg-gray-900 text-white" class="w-full text-left block px-3 py-2 rounded-md text-base font-medium transition-colors text-gray-300 hover:bg-gray-700 hover:text-white">Projects</a>
             <a (click)="closeMobileMenu()" routerLink="/calendar" routerLinkActive="bg-gray-900 text-white" class="w-full text-left block px-3 py-2 rounded-md text-base font-medium transition-colors text-gray-300 hover:bg-gray-700 hover:text-white">Calendar</a>
+            <button (click)="logout()" class="w-full text-left block px-3 py-2 mt-2 rounded-md text-base font-medium transition-colors text-white bg-indigo-600 hover:bg-indigo-700">Logout</button>
           </div>
         </nav>
       }
@@ -54,6 +59,7 @@ import { RouterLink, RouterLinkActive } from '@angular/router';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class HeaderComponent {
+  authService = inject(AuthService);
   isMobileMenuOpen = signal(false);
 
   toggleMobileMenu() {
@@ -62,5 +68,10 @@ export class HeaderComponent {
 
   closeMobileMenu() {
     this.isMobileMenuOpen.set(false);
+  }
+
+  logout() {
+    this.closeMobileMenu();
+    this.authService.logout();
   }
 }
