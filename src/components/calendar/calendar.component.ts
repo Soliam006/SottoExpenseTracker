@@ -1,0 +1,84 @@
+
+import { Component, ChangeDetectionStrategy, signal, computed, inject } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { DataService } from '../../services/data.service';
+
+interface CalendarDay {
+  date: Date;
+  dayOfMonth: number;
+  isCurrentMonth: boolean;
+  isToday: boolean;
+  totalExpense: number;
+}
+
+@Component({
+  selector: 'app-calendar',
+  standalone: true,
+  imports: [CommonModule],
+  templateUrl: './calendar.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
+})
+export class CalendarComponent {
+  dataService = inject(DataService);
+  
+  viewDate = signal(new Date());
+  
+  daysOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+
+  calendarGrid = computed<CalendarDay[]>(() => {
+    const entries = this.dataService.entries();
+    const date = this.viewDate();
+    const year = date.getFullYear();
+    const month = date.getMonth();
+
+    const firstDayOfMonth = new Date(year, month, 1);
+    const lastDayOfMonth = new Date(year, month + 1, 0);
+
+    const startDate = new Date(firstDayOfMonth);
+    startDate.setDate(startDate.getDate() - firstDayOfMonth.getDay());
+
+    const endDate = new Date(lastDayOfMonth);
+    endDate.setDate(endDate.getDate() + (6 - lastDayOfMonth.getDay()));
+
+    const grid: CalendarDay[] = [];
+    let currentDate = new Date(startDate);
+    const today = new Date();
+    today.setHours(0,0,0,0);
+
+    while (currentDate <= endDate) {
+      const ymd = currentDate.toISOString().split('T')[0];
+      const dailyEntries = entries.filter(e => e.date === ymd);
+      const totalExpense = dailyEntries.reduce((sum, e) => sum + e.price, 0);
+      
+      grid.push({
+        date: new Date(currentDate),
+        dayOfMonth: currentDate.getDate(),
+        isCurrentMonth: currentDate.getMonth() === month,
+        isToday: currentDate.getTime() === today.getTime(),
+        totalExpense: totalExpense
+      });
+      currentDate.setDate(currentDate.getDate() + 1);
+    }
+    return grid;
+  });
+
+  monthlyTotal = computed(() => {
+    const entries = this.dataService.entries();
+    const date = this.viewDate();
+    const year = date.getFullYear();
+    const month = date.getMonth() + 1; // 1-based month
+    const monthString = month.toString().padStart(2, '0');
+    
+    return entries
+      .filter(e => e.date.startsWith(`${year}-${monthString}`))
+      .reduce((sum, e) => sum + e.price, 0);
+  });
+  
+  changeMonth(offset: number) {
+    this.viewDate.update(d => {
+      const newDate = new Date(d);
+      newDate.setMonth(d.getMonth() + offset);
+      return newDate;
+    });
+  }
+}

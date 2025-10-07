@@ -1,0 +1,101 @@
+
+<div class="p-4 sm:p-6 lg:p-8">
+  <div class="flex justify-between items-center mb-6">
+    <h2 class="text-2xl font-bold text-gray-800">Entries</h2>
+    <button (click)="openModal()" class="flex items-center bg-indigo-600 text-white px-4 py-2 rounded-lg shadow-md hover:bg-indigo-700 transition-colors duration-200">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" /></svg>
+      Add Entry
+    </button>
+  </div>
+
+  <div class="bg-white rounded-lg shadow-md overflow-x-auto">
+    <table class="w-full text-left">
+      <thead class="bg-gray-50">
+        <tr>
+          <th class="p-4 font-semibold text-sm text-gray-600">Date</th>
+          <th class="p-4 font-semibold text-sm text-gray-600">Type</th>
+          <th class="p-4 font-semibold text-sm text-gray-600">Description</th>
+          <th class="p-4 font-semibold text-sm text-gray-600">Project</th>
+          <th class="p-4 font-semibold text-sm text-gray-600 text-right">Amount</th>
+          <th class="p-4 font-semibold text-sm text-gray-600 text-center">Actions</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-gray-200">
+        @for (entry of enrichedEntries(); track entry.id) {
+          <tr>
+            <td class="p-4 whitespace-nowrap">{{ entry.date }}</td>
+            <td class="p-4 whitespace-nowrap">
+              <span [class]="entry.type === 'receipt' ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800'" class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full capitalize">{{ entry.type }}</span>
+            </td>
+            <td class="p-4 whitespace-nowrap text-gray-800">{{ entry.description }}</td>
+            <td class="p-4 whitespace-nowrap text-gray-500">{{ entry.projectName }}</td>
+            <td class="p-4 whitespace-nowrap text-right font-medium text-gray-900">{{ entry.price | currency }}</td>
+            <td class="p-4 whitespace-nowrap text-center space-x-2">
+              <button (click)="openModal(entry)" class="text-indigo-600 hover:text-indigo-800 font-medium">Edit</button>
+              <button (click)="deleteEntry(entry.id)" class="text-red-600 hover:text-red-800 font-medium">Delete</button>
+            </td>
+          </tr>
+        } @empty {
+          <tr>
+            <td colspan="6" class="text-center p-8 text-gray-500">No entries found. Add one to get started!</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Modal -->
+@if (isModalOpen()) {
+  <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div class="bg-white rounded-lg shadow-2xl p-8 w-full max-w-lg mx-4">
+      <h3 class="text-2xl font-bold mb-6">{{ editingEntry() ? 'Edit' : 'Add' }} Entry</h3>
+      <form [formGroup]="entryForm" (ngSubmit)="saveEntry()">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <label for="type" class="block text-sm font-medium text-gray-700">Type</label>
+            <select id="type" formControlName="type" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+              <option value="receipt">Receipt</option>
+              <option value="expense">Expense</option>
+            </select>
+          </div>
+          <div>
+            <label for="date" class="block text-sm font-medium text-gray-700">Date</label>
+            <input id="date" type="date" formControlName="date" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+          </div>
+          <div class="md:col-span-2">
+            <label for="description" class="block text-sm font-medium text-gray-700">Description</label>
+            <input id="description" type="text" formControlName="description" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+          </div>
+          <div>
+            <label for="price" class="block text-sm font-medium text-gray-700">Price</label>
+            <input id="price" type="number" formControlName="price" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+          </div>
+          <div>
+            <label for="projectId" class="block text-sm font-medium text-gray-700">Project (Optional)</label>
+            <select id="projectId" formControlName="projectId" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+              <option value="">None</option>
+              @for (project of projects(); track project.id) {
+                <option [value]="project.id">{{ project.name }}</option>
+              }
+            </select>
+          </div>
+
+          @if (isReceipt) {
+            <div class="md:col-span-2">
+              <label for="receiptImage" class="block text-sm font-medium text-gray-700">Receipt Photo</label>
+              <input id="receiptImage" type="file" (change)="onFileChange($event)" accept="image/*" class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100">
+              @if(receiptImagePreview()) {
+                <img [src]="receiptImagePreview()" alt="Receipt Preview" class="mt-4 rounded-lg shadow-sm max-h-40">
+              }
+            </div>
+          }
+        </div>
+        <div class="mt-8 flex justify-end space-x-3">
+          <button type="button" (click)="closeModal()" class="bg-gray-200 text-gray-800 px-4 py-2 rounded-md hover:bg-gray-300">Cancel</button>
+          <button type="submit" [disabled]="entryForm.invalid" class="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 disabled:bg-indigo-300">Save</button>
+        </div>
+      </form>
+    </div>
+  </div>
+}

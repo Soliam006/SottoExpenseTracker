@@ -1,0 +1,20 @@
+
+<div class="min-h-screen">
+  <app-header [activeView]="activeView()" (viewChange)="onViewChange($event)" />
+  
+  <main>
+    <div class="max-w-7xl mx-auto">
+      @switch (activeView()) {
+        @case ('entries') {
+          <app-entries />
+        }
+        @case ('projects') {
+          <app-projects />
+        }
+        @case ('calendar') {
+          <app-calendar />
+        }
+      }
+    </div>
+  </main>
+</div>

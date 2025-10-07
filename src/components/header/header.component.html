@@ -1,0 +1,22 @@
+
+<header class="bg-white shadow-md">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex items-center justify-between h-16">
+      <div class="flex items-center">
+        <img ngSrc="https://angular.io/assets/images/logos/angular/angular.svg" alt="Angular Logo" width="40" height="40" class="h-10 w-10">
+        <h1 class="text-2xl font-bold text-gray-800 ml-3">Expense Tracker</h1>
+      </div>
+      <nav class="flex space-x-4">
+        <button (click)="setView('entries')" [class]="activeView() === 'entries' ? 'bg-indigo-600 text-white' : 'text-gray-600 hover:bg-gray-200'" class="px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200">
+          Entries
+        </button>
+        <button (click)="setView('projects')" [class]="activeView() === 'projects' ? 'bg-indigo-600 text-white' : 'text-gray-600 hover:bg-gray-200'" class="px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200">
+          Projects
+        </button>
+        <button (click)="setView('calendar')" [class]="activeView() === 'calendar' ? 'bg-indigo-600 text-white' : 'text-gray-600 hover:bg-gray-200'" class="px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200">
+          Calendar
+        </button>
+      </nav>
+    </div>
+  </div>
+</header>
