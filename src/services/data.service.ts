@@ -12,7 +12,7 @@ export class DataService {
   constructor() {
     // Load mock data
     this.projects.set([
-      { id: 'proj1', name: 'Downtown Office Renovation', client: 'Innovate Corp', address: '123 Main St, Anytown', mobile: '555-1234' },
+      { id: 'proj1', name: 'Downtown Office Renovation', client: 'Innovate Corp', address: '123 Main St, Anytown', mobile: '555-1234', imageUrl: 'https://picsum.photos/seed/proj1/600/400' },
       { id: 'proj2', name: 'Residential Kitchen Remodel', client: 'The Smiths', address: '456 Oak Ave, Suburbia', mobile: '555-5678' },
     ]);
 
