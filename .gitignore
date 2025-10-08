@@ -1,4 +1,6 @@
+# =====================
 # Logs
+# =====================
 logs
 *.log
 npm-debug.log*
@@ -7,18 +9,62 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-node_modules
-dist
-dist-ssr
+# =====================
+# Dependency directories
+# =====================
+node_modules/
+.pnp/
+.pnp.js
+
+# =====================
+# Build output
+# =====================
+dist/
+dist-ssr/
+out-tsc/
+coverage/
+tmp/
 *.local
 
+# =====================
+# Angular / CLI / Environment
+# =====================
+.angular/
+.angular-cache/
+firebase-debug.log
+.firebase/
+firebase.json
+.firebaserc
+
+# =====================
 # Editor directories and files
-.vscode/*
+# =====================
+.vscode/
 !.vscode/extensions.json
-.idea
-.DS_Store
+.idea/
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
 *.sw?
+.DS_Store
+
+# =====================
+# OS generated files
+# =====================
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# =====================
+# Optional npm files
+# =====================
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# =====================
+# Environment files
+# =====================
+.env
+.env.*.local

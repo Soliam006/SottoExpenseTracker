@@ -90,7 +90,7 @@ export default class EntriesComponent {
         type: entry.type,
         date: entry.date,
         price: entry.price,
-        projectId: entry.projectId || '',
+        projectId: entry.projectId || null,
         description: entry.description,
       });
       if (entry.receiptImages) {
@@ -160,7 +160,7 @@ export default class EntriesComponent {
         type: formValue.type!,
         date: formValue.date!,
         price: formValue.price!,
-        projectId: formValue.projectId! === '' ? undefined : formValue.projectId!,
+        projectId: formValue.projectId! === '' ? null : formValue.projectId!,
         description: formValue.description!,
         receiptImages: this.receiptImagePreviews(),
     };
