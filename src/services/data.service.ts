@@ -2,8 +2,8 @@ import { Injectable, signal, inject, effect } from '@angular/core';
 import { Project } from '../models/project.model';
 import { Entry } from '../models/entry.model';
 import { AuthService } from './auth.service';
-import { initializeApp } from 'firebase/app';
-import { getFirestore, collection, onSnapshot, addDoc, updateDoc, deleteDoc, doc, query, where, getDocs, writeBatch, Firestore, Unsubscribe } from 'firebase/firestore';
+import { initializeApp } from '@angular/fire/app';
+import { getFirestore, collection, onSnapshot, addDoc, updateDoc, deleteDoc, doc, query, where, getDocs, writeBatch, Firestore, Unsubscribe } from '@angular/fire/firestore';
 import { firebaseConfig } from '../firebase.config';
 
 @Injectable({

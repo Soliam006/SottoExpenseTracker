@@ -1,5 +1,5 @@
 {
-  "name": "Copy of Angular Expense Tracker",
-  "description": "An application to track expenses and receipts, assign them to projects, and visualize monthly spending on a calendar. Built with Angular Signals and Tailwind CSS.",
+  "name": "Expense Tracker",
+  "description": "An application to track expenses and receipts, assign them to projects, and visualize monthly spending on a calendar.",
   "requestFramePermissions": []
 }

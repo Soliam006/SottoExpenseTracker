@@ -1,8 +1,8 @@
 import { Injectable, signal, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { User } from '../models/user.model';
-import { initializeApp } from 'firebase/app';
-import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, Auth, User as FirebaseUser } from 'firebase/auth';
+import { initializeApp } from '@angular/fire/app';
+import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, Auth, User as FirebaseUser } from '@angular/fire/auth';
 import { firebaseConfig } from '../firebase.config';
 
 @Injectable({

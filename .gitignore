@@ -22,3 +22,57 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+@@ -7,18 +9,62 @@ yarn-error.log*
+
+# =====================
+# Dependency directories
+# =====================
+node_modules/
+.pnp/
+.pnp.js
+
+# =====================
+# Build output
+# =====================
+dist/
+dist-ssr/
+out-tsc/
+coverage/
+tmp/
+
+# =====================
+# Angular / CLI / Environment
+# =====================
+.angular/
+.angular-cache/
+firebase-debug.log
+.firebase/
+firebase.json
+.firebaserc
+
+# =====================
+# Editor directories and files
+# =====================
+.vscode/
+.idea/
+
+# =====================
+# OS generated files
+# =====================
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# =====================
+# Optional npm files
+# =====================
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# =====================
+# Environment files
+# =====================
+.env
+.env.*.local
