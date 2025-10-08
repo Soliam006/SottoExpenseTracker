@@ -1,53 +1,99 @@
-import { Injectable, signal } from '@angular/core';
+import { Injectable, signal, inject, effect } from '@angular/core';
 import { Project } from '../models/project.model';
 import { Entry } from '../models/entry.model';
+import { AuthService } from './auth.service';
+import { initializeApp } from 'firebase/app';
+import { getFirestore, collection, onSnapshot, addDoc, updateDoc, deleteDoc, doc, query, where, getDocs, writeBatch, Firestore, Unsubscribe } from 'firebase/firestore';
+import { firebaseConfig } from '../firebase.config';
 
 @Injectable({
   providedIn: 'root',
 })
 export class DataService {
+  private authService = inject(AuthService);
+  private db: Firestore;
+
   projects = signal<Project[]>([]);
   entries = signal<Entry[]>([]);
 
-  constructor() {
-    // Load mock data
-    this.projects.set([
-      { id: 'proj1', name: 'Downtown Office Renovation', client: 'Innovate Corp', address: '123 Main St, Anytown', mobile: '555-1234', imageUrl: 'https://picsum.photos/seed/proj1/600/400' },
-      { id: 'proj2', name: 'Residential Kitchen Remodel', client: 'The Smiths', address: '456 Oak Ave, Suburbia', mobile: '555-5678' },
-    ]);
+  private projectsUnsubscribe: Unsubscribe | null = null;
+  private entriesUnsubscribe: Unsubscribe | null = null;
 
-    this.entries.set([
-      { id: 'entry1', type: 'receipt', date: this.getYMD(new Date()), price: 125.50, projectId: 'proj1', description: 'Lumber purchase', receiptImages: [] },
-      { id: 'entry2', type: 'expense', date: this.getYMD(new Date(), -2), price: 45.00, projectId: 'proj2', description: 'Client Lunch' },
-      { id: 'entry3', type: 'receipt', date: this.getYMD(new Date(), -5), price: 850.00, projectId: 'proj1', description: 'Window fixtures', receiptImages: [] },
-    ]);
+  constructor() {
+    // NOTE: It's safe to call initializeApp multiple times.
+    const app = initializeApp(firebaseConfig);
+    this.db = getFirestore(app);
+
+    effect(() => {
+      const user = this.authService.currentUser();
+      if (user) {
+        this.subscribeToData(user.uid);
+      } else {
+        this.unsubscribeFromData();
+      }
+    });
   }
-  
-  private getYMD(date: Date, dayOffset = 0): string {
-    const d = new Date(date);
-    d.setDate(d.getDate() + dayOffset);
-    const year = d.getFullYear();
-    const month = (d.getMonth() + 1).toString().padStart(2, '0');
-    const day = d.getDate().toString().padStart(2, '0');
-    return `${year}-${month}-${day}`;
+
+  private subscribeToData(uid: string) {
+    this.unsubscribeFromData();
+    
+    const projectsCollection = collection(this.db, 'users', uid, 'projects');
+    this.projectsUnsubscribe = onSnapshot(projectsCollection, (snapshot) => {
+      const projects = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Project));
+      this.projects.set(projects);
+    });
+
+    const entriesCollection = collection(this.db, 'users', uid, 'entries');
+    this.entriesUnsubscribe = onSnapshot(entriesCollection, (snapshot) => {
+      const entries = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Entry));
+      this.entries.set(entries);
+    });
+  }
+
+  private unsubscribeFromData() {
+    if (this.projectsUnsubscribe) {
+      this.projectsUnsubscribe();
+      this.projectsUnsubscribe = null;
+    }
+    if (this.entriesUnsubscribe) {
+      this.entriesUnsubscribe();
+      this.entriesUnsubscribe = null;
+    }
+    this.projects.set([]);
+    this.entries.set([]);
+  }
+
+  private getUid(): string | null {
+    return this.authService.currentUser()?.uid ?? null;
   }
 
   // Project Methods
-  addProject(project: Omit<Project, 'id'>) {
-    const newProject: Project = { ...project, id: `proj_${Date.now()}` };
-    this.projects.update(projects => [...projects, newProject]);
+  async addProject(project: Omit<Project, 'id'>) {
+    const uid = this.getUid();
+    if (!uid) throw new Error('User not logged in');
+    await addDoc(collection(this.db, 'users', uid, 'projects'), project);
   }
 
-  updateProject(updatedProject: Project) {
-    this.projects.update(projects =>
-      projects.map(p => (p.id === updatedProject.id ? updatedProject : p))
-    );
+  async updateProject(updatedProject: Project) {
+    const uid = this.getUid();
+    if (!uid) throw new Error('User not logged in');
+    const { id, ...projectData } = updatedProject;
+    await updateDoc(doc(this.db, 'users', uid, 'projects', id), projectData);
   }
 
-  deleteProject(id: string) {
-    // Also delete associated entries
-    this.entries.update(entries => entries.filter(e => e.projectId !== id));
-    this.projects.update(projects => projects.filter(p => p.id !== id));
+  async deleteProject(id: string) {
+    const uid = this.getUid();
+    if (!uid) throw new Error('User not logged in');
+
+    const entriesQuery = query(collection(this.db, 'users', uid, 'entries'), where('projectId', '==', id));
+    const entriesSnapshot = await getDocs(entriesQuery);
+    const batch = writeBatch(this.db);
+    entriesSnapshot.forEach(doc => {
+      batch.delete(doc.ref);
+    });
+    await batch.commit();
+    
+    await deleteDoc(doc(this.db, 'users',uid, 'projects', id));
   }
   
   getProjectById(id: string): Project | undefined {
@@ -55,18 +101,22 @@ export class DataService {
   }
 
   // Entry Methods
-  addEntry(entry: Omit<Entry, 'id'>) {
-    const newEntry: Entry = { ...entry, id: `entry_${Date.now()}` };
-    this.entries.update(entries => [...entries, newEntry]);
+  async addEntry(entry: Omit<Entry, 'id'>) {
+    const uid = this.getUid();
+    if (!uid) throw new Error('User not logged in');
+    await addDoc(collection(this.db, 'users', uid, 'entries'), entry);
   }
 
-  updateEntry(updatedEntry: Entry) {
-    this.entries.update(entries =>
-      entries.map(e => (e.id === updatedEntry.id ? updatedEntry : e))
-    );
+  async updateEntry(updatedEntry: Entry) {
+    const uid = this.getUid();
+    if (!uid) throw new Error('User not logged in');
+    const { id, ...entryData } = updatedEntry;
+    await updateDoc(doc(this.db, 'users', uid, 'entries', id), entryData);
   }
 
-  deleteEntry(id: string) {
-    this.entries.update(entries => entries.filter(e => e.id !== id));
+  async deleteEntry(id: string) {
+    const uid = this.getUid();
+    if (!uid) throw new Error('User not logged in');
+    await deleteDoc(doc(this.db, 'users', uid, 'entries', id));
   }
 }

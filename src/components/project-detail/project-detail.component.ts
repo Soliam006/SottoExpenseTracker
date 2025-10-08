@@ -121,7 +121,7 @@ export default class ProjectDetailComponent {
       this.imagePreview.set(null);
   }
 
-  saveProject() {
+  async saveProject() {
     if (this.projectForm.invalid) return;
     
     const p = this.project();
@@ -136,8 +136,13 @@ export default class ProjectDetailComponent {
         imageUrl: this.imagePreview() ?? undefined,
     };
     
-    this.dataService.updateProject({ ...projectData, id: p.id });
-    this.closeEditModal();
+    try {
+        await this.dataService.updateProject({ ...projectData, id: p.id });
+        this.closeEditModal();
+    } catch(error) {
+        console.error("Error updating project:", error);
+        alert("There was an error updating the project. Please try again.");
+    }
   }
   
   // --- Delete Logic ---
@@ -150,7 +155,7 @@ export default class ProjectDetailComponent {
     this.isDeleteModalOpen.set(false);
   }
 
-  deleteProject() {
+  async deleteProject() {
       const p = this.project();
       if (!p) return;
 
@@ -158,8 +163,13 @@ export default class ProjectDetailComponent {
       const enteredConfirmation = this.deleteConfirmationForm.value.confirmationText?.trim();
 
       if (expectedConfirmation === enteredConfirmation) {
-          this.dataService.deleteProject(p.id);
-          this.router.navigate(['/projects']);
+          try {
+              await this.dataService.deleteProject(p.id);
+              this.router.navigate(['/projects']);
+          } catch (error) {
+              console.error("Error deleting project:", error);
+              alert("There was an error deleting the project. Please try again.");
+          }
       } else {
           alert('Confirmation text does not match.');
       }

@@ -1,6 +1,9 @@
 import { Injectable, signal, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { User } from '../models/user.model';
+import { initializeApp } from 'firebase/app';
+import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, Auth, User as FirebaseUser } from 'firebase/auth';
+import { firebaseConfig } from '../firebase.config';
 
 @Injectable({
   providedIn: 'root'
@@ -9,58 +12,37 @@ export class AuthService {
   private router = inject(Router);
   currentUser = signal<User | null>(null);
 
-  // A simple in-memory store for users. In a real app, this would be a backend.
-  // For this demo, we'll use localStorage to persist users.
-  private users: { [email: string]: string } = {};
+  private auth: Auth;
 
   constructor() {
-    this.loadUsers();
+    const app = initializeApp(firebaseConfig);
+    this.auth = getAuth(app);
     this.checkAuth();
   }
 
-  private loadUsers() {
-    const storedUsers = localStorage.getItem('expense_tracker_users');
-    if (storedUsers) {
-      this.users = JSON.parse(storedUsers);
-    }
+  private checkAuth() {
+    onAuthStateChanged(this.auth, (user: FirebaseUser | null) => {
+      if (user) {
+        this.currentUser.set({ uid: user.uid, email: user.email });
+        if (this.router.url.includes('/login') || this.router.url.includes('/signup')) {
+            this.router.navigate(['/entries']);
+        }
+      } else {
+        this.currentUser.set(null);
+        this.router.navigate(['/login']);
+      }
+    });
   }
 
-  private saveUsers() {
-    localStorage.setItem('expense_tracker_users', JSON.stringify(this.users));
+  async signup(email: string, password: string): Promise<void> {
+    await createUserWithEmailAndPassword(this.auth, email, password);
   }
 
-  checkAuth() {
-    const storedUser = localStorage.getItem('expense_tracker_user');
-    if (storedUser) {
-      this.currentUser.set(JSON.parse(storedUser));
-    }
+  async login(email: string, password: string): Promise<void> {
+    await signInWithEmailAndPassword(this.auth, email, password);
   }
 
-  signup(email: string, password: string): boolean {
-    if (this.users[email]) {
-      // User already exists
-      return false;
-    }
-    this.users[email] = password; // In a real app, hash the password!
-    this.saveUsers();
-    this.login(email, password);
-    return true;
-  }
-
-  login(email: string, password: string): boolean {
-    if (this.users[email] && this.users[email] === password) {
-      const user: User = { email };
-      this.currentUser.set(user);
-      localStorage.setItem('expense_tracker_user', JSON.stringify(user));
-      this.router.navigate(['/entries']);
-      return true;
-    }
-    return false;
-  }
-
-  logout() {
-    this.currentUser.set(null);
-    localStorage.removeItem('expense_tracker_user');
-    this.router.navigate(['/login']);
+  async logout(): Promise<void> {
+    await signOut(this.auth);
   }
 }

@@ -23,15 +23,31 @@ export default class LoginComponent {
 
   errorMessage = signal<string | null>(null);
 
-  login() {
+  async login() {
     if (this.loginForm.invalid) {
       return;
     }
+    this.errorMessage.set(null);
     const { email, password } = this.loginForm.value;
-    const success = this.authService.login(email!, password!);
+    try {
+      await this.authService.login(email!, password!);
+    } catch (error: any) {
+      this.errorMessage.set(this.getFirebaseErrorMessage(error));
+    }
+  }
 
-    if (!success) {
-      this.errorMessage.set('Invalid email or password.');
+  private getFirebaseErrorMessage(error: any): string {
+    switch (error.code) {
+      case 'auth/invalid-email':
+        return 'Invalid email address format.';
+      case 'auth/user-disabled':
+        return 'This user account has been disabled.';
+      case 'auth/user-not-found':
+      case 'auth/wrong-password':
+      case 'auth/invalid-credential':
+        return 'Invalid email or password.';
+      default:
+        return 'An unexpected error occurred. Please try again.';
     }
   }
 }

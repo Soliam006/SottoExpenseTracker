@@ -23,17 +23,29 @@ export default class SignupComponent {
 
   errorMessage = signal<string | null>(null);
 
-  signup() {
+  async signup() {
     if (this.signupForm.invalid) {
       return;
     }
+    this.errorMessage.set(null);
     const { email, password } = this.signupForm.value;
-    const success = this.authService.signup(email!, password!);
+    try {
+      await this.authService.signup(email!, password!);
+    } catch (error: any) {
+      this.errorMessage.set(this.getFirebaseErrorMessage(error));
+    }
+  }
 
-    if (!success) {
-      this.errorMessage.set('An account with this email already exists.');
-    } else {
-        // Successful signup logs the user in and redirects, handled by the service.
+  private getFirebaseErrorMessage(error: any): string {
+    switch (error.code) {
+      case 'auth/email-already-in-use':
+        return 'An account with this email already exists.';
+      case 'auth/invalid-email':
+        return 'Invalid email address format.';
+      case 'auth/weak-password':
+        return 'Password is too weak. Please use a stronger password.';
+      default:
+        return 'An unexpected error occurred. Please try again.';
     }
   }
 }

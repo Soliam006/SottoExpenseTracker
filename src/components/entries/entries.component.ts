@@ -151,7 +151,7 @@ export default class EntriesComponent {
     this.receiptImagePreviews.update(previews => previews.filter((_, index) => index !== indexToRemove));
   }
 
-  saveEntry() {
+  async saveEntry() {
     if (this.entryForm.invalid) {
       return;
     }
@@ -170,17 +170,27 @@ export default class EntriesComponent {
     }
 
     const currentEntry = this.editingEntry();
-    if (currentEntry) {
-      this.dataService.updateEntry({ ...entryData, id: currentEntry.id });
-    } else {
-      this.dataService.addEntry(entryData);
+    try {
+        if (currentEntry) {
+          await this.dataService.updateEntry({ ...entryData, id: currentEntry.id });
+        } else {
+          await this.dataService.addEntry(entryData);
+        }
+        this.closeModal();
+    } catch (error) {
+        console.error("Error saving entry:", error);
+        alert("There was an error saving the entry. Please try again.");
     }
-    this.closeModal();
   }
 
-  deleteEntry(id: string) {
+  async deleteEntry(id: string) {
     if(confirm('Are you sure you want to delete this entry?')) {
-        this.dataService.deleteEntry(id);
+        try {
+            await this.dataService.deleteEntry(id);
+        } catch (error) {
+            console.error("Error deleting entry:", error);
+            alert("There was an error deleting the entry. Please try again.");
+        }
     }
   }
 

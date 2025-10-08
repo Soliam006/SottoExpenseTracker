@@ -84,7 +84,7 @@ export default class ProjectsComponent {
       this.imagePreview.set(null);
   }
 
-  saveProject() {
+  async saveProject() {
     if (this.projectForm.invalid) {
       return;
     }
@@ -98,11 +98,16 @@ export default class ProjectsComponent {
     };
     
     const currentProject = this.editingProject();
-    if (currentProject) {
-      this.dataService.updateProject({ ...projectData, id: currentProject.id });
-    } else {
-      this.dataService.addProject(projectData);
+    try {
+        if (currentProject) {
+          await this.dataService.updateProject({ ...projectData, id: currentProject.id });
+        } else {
+          await this.dataService.addProject(projectData);
+        }
+        this.closeModal();
+    } catch (error) {
+        console.error("Error saving project:", error);
+        alert("There was an error saving the project. Please try again.");
     }
-    this.closeModal();
   }
 }

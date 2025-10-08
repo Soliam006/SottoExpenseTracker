@@ -70,8 +70,8 @@ export class HeaderComponent {
     this.isMobileMenuOpen.set(false);
   }
 
-  logout() {
+  async logout() {
     this.closeMobileMenu();
-    this.authService.logout();
+    await this.authService.logout();
   }
 }
