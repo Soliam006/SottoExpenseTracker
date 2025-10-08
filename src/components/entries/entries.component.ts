@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { DataService } from '../../services/data.service';
 import { Entry } from '../../models/entry.model';
+import { CloudinaryService } from '../../services/cloudinary.service';
 
 @Component({
   selector: 'app-entries',
@@ -13,6 +14,7 @@ import { Entry } from '../../models/entry.model';
 })
 export default class EntriesComponent {
   dataService = inject(DataService);
+  cloudinaryService = inject(CloudinaryService);
   // FIX: Explicitly type `fb` to resolve TypeScript's incorrect type inference.
   private fb: FormBuilder = inject(FormBuilder);
 
@@ -20,7 +22,10 @@ export default class EntriesComponent {
   projects = this.dataService.projects;
   isModalOpen = signal(false);
   editingEntry = signal<Entry | null>(null);
-  receiptImagePreviews = signal<string[]>([]);
+  
+  // Image states
+  receiptImagePreviews = signal<string[]>([]); // holds base64 strings for new images
+  existingReceiptImages = signal<{publicId: string, url: string}[]>([]); // holds info for already uploaded images
 
   // Filters
   filterType = signal<'all' | 'receipt' | 'expense'>('all');
@@ -85,6 +90,8 @@ export default class EntriesComponent {
   openModal(entry: Entry | null = null) {
     this.editingEntry.set(entry);
     this.receiptImagePreviews.set([]);
+    this.existingReceiptImages.set([]);
+
     if (entry) {
       this.entryForm.patchValue({
         type: entry.type,
@@ -93,8 +100,13 @@ export default class EntriesComponent {
         projectId: entry.projectId || null,
         description: entry.description,
       });
-      if (entry.receiptImages) {
-        this.receiptImagePreviews.set(entry.receiptImages);
+      if (entry.receiptImagePublicIds) {
+        this.existingReceiptImages.set(
+          entry.receiptImagePublicIds.map(id => ({
+            publicId: id,
+            url: this.cloudinaryService.getImageUrl(id, 100, 100)
+          }))
+        );
       }
     } else {
       this.entryForm.reset({
@@ -113,6 +125,7 @@ export default class EntriesComponent {
     this.editingEntry.set(null);
     this.entryForm.reset();
     this.receiptImagePreviews.set([]);
+    this.existingReceiptImages.set([]);
   }
 
   async onFileChange(event: Event) {
@@ -120,9 +133,10 @@ export default class EntriesComponent {
     if (!input.files) return;
 
     const files = Array.from(input.files);
-    const currentImages = this.receiptImagePreviews();
+    const currentNewCount = this.receiptImagePreviews().length;
+    const currentExistingCount = this.existingReceiptImages().length;
 
-    if (files.length + currentImages.length > 3) {
+    if (files.length + currentNewCount + currentExistingCount > 3) {
       alert('You can upload a maximum of 3 images.');
       input.value = ''; // Clear file input
       return;
@@ -147,30 +161,41 @@ export default class EntriesComponent {
     }
   }
   
-  removeImage(indexToRemove: number) {
+  removeNewImage(indexToRemove: number) {
     this.receiptImagePreviews.update(previews => previews.filter((_, index) => index !== indexToRemove));
   }
+
+  removeExistingImage(publicIdToRemove: string) {
+    this.existingReceiptImages.update(images => images.filter(img => img.publicId !== publicIdToRemove));
+  }
+
 
   async saveEntry() {
     if (this.entryForm.invalid) {
       return;
     }
-    const formValue = this.entryForm.value;
-    const entryData: Omit<Entry, 'id'> = {
-        type: formValue.type!,
-        date: formValue.date!,
-        price: formValue.price!,
-        projectId: formValue.projectId! === '' ? null : formValue.projectId!,
-        description: formValue.description!,
-        receiptImages: this.receiptImagePreviews(),
-    };
-    
-    if (entryData.type !== 'receipt') {
-        entryData.receiptImages = [];
-    }
-
-    const currentEntry = this.editingEntry();
     try {
+        const uploadPromises = this.receiptImagePreviews().map(base64 => this.cloudinaryService.uploadImage(base64));
+        const newUploads = await Promise.all(uploadPromises);
+        const newPublicIds = newUploads.map(res => res.public_id);
+        
+        const existingPublicIds = this.existingReceiptImages().map(img => img.publicId);
+
+        const formValue = this.entryForm.value;
+        const entryData: Omit<Entry, 'id'> = {
+            type: formValue.type!,
+            date: formValue.date!,
+            price: formValue.price!,
+            projectId: formValue.projectId! === '' ? null : formValue.projectId!,
+            description: formValue.description!,
+            receiptImagePublicIds: [...existingPublicIds, ...newPublicIds],
+        };
+        
+        if (entryData.type !== 'receipt') {
+            entryData.receiptImagePublicIds = [];
+        }
+
+        const currentEntry = this.editingEntry();
         if (currentEntry) {
           await this.dataService.updateEntry({ ...entryData, id: currentEntry.id });
         } else {

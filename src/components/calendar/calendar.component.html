@@ -66,9 +66,9 @@
                   </div>
                   <p class="text-lg font-bold text-gray-900">{{ entry.price | currency }}</p>
                   </div>
-                  @if (entry.receiptImages && entry.receiptImages.length > 0) {
+                  @if (entry.receiptImageUrls && entry.receiptImageUrls.length > 0) {
                   <div class="mt-3 flex space-x-2">
-                      @for (image of entry.receiptImages; track $index) {
+                      @for (image of entry.receiptImageUrls; track $index) {
                       <img [src]="image" alt="Receipt image" class="h-16 w-16 rounded-md object-cover shadow-sm">
                       }
                   </div>

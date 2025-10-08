@@ -5,5 +5,5 @@ export interface Project {
   client: string;
   address: string;
   mobile: string;
-  imageUrl?: string;
+  imagePublicId?: string;
 }

@@ -4,6 +4,6 @@ export interface Entry {
   date: string; // YYYY-MM-DD
   price: number;
   projectId?: string;
-  receiptImages?: string[]; // array of base64 strings
+  receiptImagePublicIds?: string[]; // array of cloudinary public_ids
   description: string;
 }

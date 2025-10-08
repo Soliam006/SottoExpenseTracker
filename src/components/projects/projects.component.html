@@ -17,8 +17,8 @@
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       @for (project of projects(); track project.id) {
         <a [routerLink]="['/projects', project.id]" class="block bg-white rounded-lg shadow-lg overflow-hidden transform hover:-translate-y-1 transition-transform duration-300">
-          @if (project.imageUrl) {
-            <img [src]="project.imageUrl" [alt]="project.name" class="h-48 w-full object-cover">
+          @if (project.imagePublicId) {
+            <img [src]="getProjectImageUrl(project.imagePublicId)" [alt]="project.name" class="h-48 w-full object-cover">
           } @else {
             <div class="h-48 w-full bg-gray-200 flex items-center justify-center">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">

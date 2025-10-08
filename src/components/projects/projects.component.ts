@@ -5,6 +5,7 @@ import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { DataService } from '../../services/data.service';
 import { Project } from '../../models/project.model';
 import { RouterModule } from '@angular/router';
+import { CloudinaryService } from '../../services/cloudinary.service';
 
 @Component({
   selector: 'app-projects',
@@ -15,6 +16,7 @@ import { RouterModule } from '@angular/router';
 })
 export default class ProjectsComponent {
   dataService = inject(DataService);
+  cloudinaryService = inject(CloudinaryService);
   // FIX: Explicitly type `fb` to resolve TypeScript's incorrect type inference.
   private fb: FormBuilder = inject(FormBuilder);
   
@@ -34,7 +36,7 @@ export default class ProjectsComponent {
     this.editingProject.set(project);
     if (project) {
       this.projectForm.patchValue(project);
-      this.imagePreview.set(project.imageUrl ?? null);
+      this.imagePreview.set(project.imagePublicId ? this.cloudinaryService.getImageUrl(project.imagePublicId) : null);
     } else {
       this.projectForm.reset();
       this.imagePreview.set(null);
@@ -88,26 +90,42 @@ export default class ProjectsComponent {
     if (this.projectForm.invalid) {
       return;
     }
-    const formValue = this.projectForm.value;
-    const projectData = {
-        name: formValue.name!,
-        client: formValue.client!,
-        address: formValue.address!,
-        mobile: formValue.mobile!,
-        imageUrl: this.imagePreview() ?? undefined,
-    };
+
+    let imagePublicId: string | undefined = this.editingProject()?.imagePublicId;
+    const preview = this.imagePreview();
     
-    const currentProject = this.editingProject();
     try {
-        if (currentProject) {
-          await this.dataService.updateProject({ ...projectData, id: currentProject.id });
-        } else {
-          await this.dataService.addProject(projectData);
-        }
-        this.closeModal();
+      if (preview && preview.startsWith('data:image')) {
+        const uploadResponse = await this.cloudinaryService.uploadImage(preview);
+        imagePublicId = uploadResponse.public_id;
+      } else if (!preview) {
+        imagePublicId = undefined;
+      }
+
+      const formValue = this.projectForm.value;
+      const projectData = {
+          name: formValue.name!,
+          client: formValue.client!,
+          address: formValue.address!,
+          mobile: formValue.mobile!,
+          imagePublicId: imagePublicId,
+      };
+      
+      const currentProject = this.editingProject();
+      if (currentProject) {
+        await this.dataService.updateProject({ ...projectData, id: currentProject.id });
+      } else {
+        await this.dataService.addProject(projectData);
+      }
+      this.closeModal();
+
     } catch (error) {
         console.error("Error saving project:", error);
         alert("There was an error saving the project. Please try again.");
     }
+  }
+
+  getProjectImageUrl(publicId: string): string {
+    return this.cloudinaryService.getImageUrl(publicId, 400, 192);
   }
 }

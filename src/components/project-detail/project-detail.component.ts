@@ -5,6 +5,7 @@ import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { DataService } from '../../services/data.service';
 import { Project } from '../../models/project.model';
 import { Entry } from '../../models/entry.model';
+import { CloudinaryService } from '../../services/cloudinary.service';
 
 @Component({
   selector: 'app-project-detail',
@@ -17,6 +18,7 @@ export default class ProjectDetailComponent {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private dataService = inject(DataService);
+  private cloudinaryService = inject(CloudinaryService);
   // FIX: Explicitly type `fb` to resolve TypeScript's incorrect type inference.
   private fb: FormBuilder = inject(FormBuilder);
 
@@ -25,7 +27,15 @@ export default class ProjectDetailComponent {
   project = computed<Project | null>(() => {
     const id = this.projectId();
     if (!id) return null;
-    return this.dataService.getProjectById(id) ?? null;
+    return this.dataService.projects().find(p => p.id === id) ?? null;
+  });
+  
+  projectImageUrl = computed(() => {
+    const p = this.project();
+    if (p?.imagePublicId) {
+      return this.cloudinaryService.getImageUrl(p.imagePublicId, 800, 256);
+    }
+    return null;
   });
 
   projectEntries = computed(() => {
@@ -67,7 +77,11 @@ export default class ProjectDetailComponent {
         untracked(() => {
             if (!p && this.projectId()) {
                 // If projectId is set but project is not found, redirect.
-                this.router.navigate(['/projects']);
+                // This can happen after deletion.
+                const projects = this.dataService.projects();
+                if (projects.length > 0) { // check if data is loaded
+                    this.router.navigate(['/projects']);
+                }
             }
         })
     });
@@ -78,7 +92,7 @@ export default class ProjectDetailComponent {
     const p = this.project();
     if (!p) return;
     this.projectForm.patchValue(p);
-    this.imagePreview.set(p.imageUrl ?? null);
+    this.imagePreview.set(p.imagePublicId ? this.cloudinaryService.getImageUrl(p.imagePublicId) : null);
     this.isEditModalOpen.set(true);
   }
 
@@ -127,18 +141,28 @@ export default class ProjectDetailComponent {
     const p = this.project();
     if (!p) return;
 
-    const formValue = this.projectForm.value;
-    const projectData = {
-        name: formValue.name!,
-        client: formValue.client!,
-        address: formValue.address!,
-        mobile: formValue.mobile!,
-        imageUrl: this.imagePreview() ?? undefined,
-    };
-    
+    let imagePublicId: string | undefined = p.imagePublicId;
+    const preview = this.imagePreview();
+
     try {
-        await this.dataService.updateProject({ ...projectData, id: p.id });
-        this.closeEditModal();
+      if (preview && preview.startsWith('data:image')) {
+        const uploadResponse = await this.cloudinaryService.uploadImage(preview);
+        imagePublicId = uploadResponse.public_id;
+      } else if (!preview) {
+        imagePublicId = undefined;
+      }
+
+      const formValue = this.projectForm.value;
+      const projectData = {
+          name: formValue.name!,
+          client: formValue.client!,
+          address: formValue.address!,
+          mobile: formValue.mobile!,
+          imagePublicId: imagePublicId,
+      };
+      
+      await this.dataService.updateProject({ ...projectData, id: p.id });
+      this.closeEditModal();
     } catch(error) {
         console.error("Error updating project:", error);
         alert("There was an error updating the project. Please try again.");
@@ -165,7 +189,7 @@ export default class ProjectDetailComponent {
       if (expectedConfirmation === enteredConfirmation) {
           try {
               await this.dataService.deleteProject(p.id);
-              this.router.navigate(['/projects']);
+              // Navigation will be handled by the effect
           } catch (error) {
               console.error("Error deleting project:", error);
               alert("There was an error deleting the project. Please try again.");

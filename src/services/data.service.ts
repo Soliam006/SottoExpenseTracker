@@ -1,28 +1,17 @@
-import {effect, inject, Injectable, signal} from '@angular/core';
-import {Project} from '../models/project.model';
-import {Entry} from '../models/entry.model';
-import {AuthService} from './auth.service';
-import {
-  addDoc,
-  collection,
-  deleteDoc,
-  doc,
-  Firestore,
-  getDocs,
-  onSnapshot,
-  query,
-  Unsubscribe,
-  updateDoc,
-  where,
-  writeBatch
-} from '@angular/fire/firestore';
+import { Injectable, signal, inject, effect } from '@angular/core';
+import { Project } from '../models/project.model';
+import { Entry } from '../models/entry.model';
+import { AuthService } from './auth.service';
+import { initializeApp } from 'firebase/app';
+import { getFirestore, collection, onSnapshot, addDoc, updateDoc, deleteDoc, doc, query, where, getDocs, writeBatch, Firestore, Unsubscribe } from 'firebase/firestore';
+import { firebaseConfig } from '../firebase.config';
 
 @Injectable({
   providedIn: 'root',
 })
 export class DataService {
   private authService = inject(AuthService);
-  private db: Firestore = inject(Firestore);
+  private db: Firestore;
 
   projects = signal<Project[]>([]);
   entries = signal<Entry[]>([]);
@@ -31,6 +20,10 @@ export class DataService {
   private entriesUnsubscribe: Unsubscribe | null = null;
 
   constructor() {
+    // NOTE: It's safe to call initializeApp multiple times.
+    const app = initializeApp(firebaseConfig);
+    this.db = getFirestore(app);
+
     effect(() => {
       const user = this.authService.currentUser();
       if (user) {

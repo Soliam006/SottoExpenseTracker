@@ -2,6 +2,7 @@ import { Component, ChangeDetectionStrategy, signal, computed, inject } from '@a
 import { CommonModule } from '@angular/common';
 import { DataService } from '../../services/data.service';
 import { Entry } from '../../models/entry.model';
+import { CloudinaryService } from '../../services/cloudinary.service';
 
 interface CalendarDay {
   date: Date;
@@ -13,6 +14,7 @@ interface CalendarDay {
 
 interface EnrichedEntry extends Entry {
   projectName: string;
+  receiptImageUrls?: string[];
 }
 
 @Component({
@@ -24,6 +26,7 @@ interface EnrichedEntry extends Entry {
 })
 export default class CalendarComponent {
   dataService = inject(DataService);
+  cloudinaryService = inject(CloudinaryService);
   
   viewDate = signal(new Date());
   
@@ -114,7 +117,8 @@ export default class CalendarComponent {
       .filter(entry => entry.date === ymd)
       .map(entry => ({
         ...entry,
-        projectName: projects.find(p => p.id === entry.projectId)?.name || 'N/A'
+        projectName: projects.find(p => p.id === entry.projectId)?.name || 'N/A',
+        receiptImageUrls: entry.receiptImagePublicIds?.map(id => this.cloudinaryService.getImageUrl(id, 64, 64))
       }));
       
     this.modalEntries.set(dayEntries);

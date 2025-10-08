@@ -119,15 +119,23 @@
           @if (isReceipt) {
             <div class="md:col-span-2">
               <label for="receiptImage" class="block text-sm font-medium text-gray-700">Receipt Photos (up to 3)</label>
-              @if (receiptImagePreviews().length < 3) {
+              @if (existingReceiptImages().length + receiptImagePreviews().length < 3) {
                 <input id="receiptImage" type="file" (change)="onFileChange($event)" accept="image/*" multiple class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100">
               }
-              @if(receiptImagePreviews().length > 0) {
+              @if(existingReceiptImages().length > 0 || receiptImagePreviews().length > 0) {
                 <div class="mt-4 grid grid-cols-3 gap-4">
-                  @for (image of receiptImagePreviews(); track $index) {
+                  @for (image of existingReceiptImages(); track image.publicId) {
+                    <div class="relative group">
+                      <img [src]="image.url" alt="Receipt Preview" class="rounded-lg shadow-sm object-cover h-24 w-full">
+                      <button (click)="removeExistingImage(image.publicId)" type="button" class="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 h-6 w-6 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                      </button>
+                    </div>
+                  }
+                   @for (image of receiptImagePreviews(); track $index) {
                     <div class="relative group">
                       <img [src]="image" alt="Receipt Preview {{ $index + 1 }}" class="rounded-lg shadow-sm object-cover h-24 w-full">
-                      <button (click)="removeImage($index)" type="button" class="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 h-6 w-6 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                      <button (click)="removeNewImage($index)" type="button" class="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 h-6 w-6 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
                       </button>
                     </div>
