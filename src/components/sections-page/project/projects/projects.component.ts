@@ -1,16 +1,16 @@
-
-import { Component, ChangeDetectionStrategy, inject, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
-import { DataService } from '../../services/data.service';
-import { Project } from '../../models/project.model';
-import { RouterModule } from '@angular/router';
-import { CloudinaryService } from '../../services/cloudinary.service';
+import {ChangeDetectionStrategy, Component, inject, signal} from '@angular/core';
+import {CommonModule} from '@angular/common';
+import {FormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
+import {DataService} from '@/src/services/data.service';
+import {Project} from '@/src/models/project.model';
+import {RouterModule} from '@angular/router';
+import {CloudinaryService} from '@/src/services/cloudinary.service';
+import {TranslatePipe} from "@/src/shared/pipes/translate.pipe";
 
 @Component({
   selector: 'app-projects',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterModule],
+    imports: [CommonModule, ReactiveFormsModule, RouterModule, TranslatePipe],
   templateUrl: './projects.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

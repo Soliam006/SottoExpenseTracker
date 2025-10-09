@@ -1,8 +1,10 @@
 import { Component, ChangeDetectionStrategy, signal, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { DataService } from '../../services/data.service';
-import { Entry } from '../../models/entry.model';
-import { CloudinaryService } from '../../services/cloudinary.service';
+import {TranslatePipe} from "@/src/shared/pipes/translate.pipe";
+import {DataService} from "@/src/services/data.service";
+import {CloudinaryService} from "@/src/services/cloudinary.service";
+import {LanguageService} from "@/src/core/services/language.service";
+import {Entry} from "@/src/models/entry.model";
 
 interface CalendarDay {
   date: Date;
@@ -20,22 +22,26 @@ interface EnrichedEntry extends Entry {
 @Component({
   selector: 'app-calendar',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, TranslatePipe],
   templateUrl: './calendar.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export default class CalendarComponent {
   dataService = inject(DataService);
   cloudinaryService = inject(CloudinaryService);
-  
+  languageService = inject(LanguageService);
+
   viewDate = signal(new Date());
-  
+
   // Modal state
   isModalOpen = signal(false);
   modalDate = signal<Date | null>(null);
   modalEntries = signal<EnrichedEntry[]>([]);
-  
-  daysOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+
+  daysOfWeek = computed(() => {
+    const translationKeys = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
+    return translationKeys.map(day => this.languageService.get(`calendar.day.${day}`));
+  });
 
   calendarGrid = computed<CalendarDay[]>(() => {
     const entries = this.dataService.entries();
@@ -65,7 +71,7 @@ export default class CalendarComponent {
 
       const dailyEntries = entries.filter(e => e.date === ymd);
       const totalExpense = dailyEntries.reduce((sum, e) => sum + e.price, 0);
-      
+
       grid.push({
         date: new Date(currentDate),
         dayOfMonth: currentDate.getDate(),
@@ -84,12 +90,12 @@ export default class CalendarComponent {
     const year = date.getFullYear();
     const month = date.getMonth() + 1; // 1-based month
     const monthString = month.toString().padStart(2, '0');
-    
+
     return entries
-      .filter(e => e.date.startsWith(`${year}-${monthString}`))
-      .reduce((sum, e) => sum + e.price, 0);
+        .filter(e => e.date.startsWith(`${year}-${monthString}`))
+        .reduce((sum, e) => sum + e.price, 0);
   });
-  
+
   changeMonth(offset: number) {
     this.viewDate.update(d => {
       const newDate = new Date(d);
@@ -102,7 +108,7 @@ export default class CalendarComponent {
     if (day.totalExpense === 0) {
       return; // Do nothing if there are no entries
     }
-    
+
     this.modalDate.set(day.date);
 
     const projects = this.dataService.projects();
@@ -114,13 +120,13 @@ export default class CalendarComponent {
     const ymd = `${year}-${month}-${dayOfMonth}`;
 
     const dayEntries = entries
-      .filter(entry => entry.date === ymd)
-      .map(entry => ({
-        ...entry,
-        projectName: projects.find(p => p.id === entry.projectId)?.name || 'N/A',
-        receiptImageUrls: entry.receiptImagePublicIds?.map(id => this.cloudinaryService.getImageUrl(id, 64, 64))
-      }));
-      
+        .filter(entry => entry.date === ymd)
+        .map(entry => ({
+          ...entry,
+          projectName: projects.find(p => p.id === entry.projectId)?.name || 'N/A',
+          receiptImageUrls: entry.receiptImagePublicIds?.map(id => this.cloudinaryService.getImageUrl(id, 64, 64))
+        }));
+
     this.modalEntries.set(dayEntries);
     this.isModalOpen.set(true);
   }

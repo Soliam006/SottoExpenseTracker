@@ -1,14 +1,15 @@
 import { Component, ChangeDetectionStrategy, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
-import { DataService } from '../../services/data.service';
-import { Entry } from '../../models/entry.model';
-import { CloudinaryService } from '../../services/cloudinary.service';
+import { DataService } from '../../../../services/data.service';
+import { Entry } from '../../../../models/entry.model';
+import { CloudinaryService } from '../../../../services/cloudinary.service';
+import {TranslatePipe} from "@/src/shared/pipes/translate.pipe";
 
 @Component({
   selector: 'app-entries',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+    imports: [CommonModule, ReactiveFormsModule, TranslatePipe],
   templateUrl: './entries.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -180,6 +181,11 @@ export default class EntriesComponent {
         const newPublicIds = newUploads.map(res => res.public_id);
         
         const existingPublicIds = this.existingReceiptImages().map(img => img.publicId);
+
+        if (this.receiptImagePreviews().length > 0 && newPublicIds.length === 0) {
+          alert('No se pudieron subir las imágenes. Intenta nuevamente.');
+          return;
+        }
 
         const formValue = this.entryForm.value;
         const entryData: Omit<Entry, 'id'> = {

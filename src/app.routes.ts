@@ -5,17 +5,17 @@ import { guestGuard } from './guards/guest.guard';
 export const routes: Routes = [
   {
     path: 'login',
-    loadComponent: () => import('./components/login/login.component'),
+    loadComponent: () => import('@/src/components/auth/login/login.component'),
     canActivate: [guestGuard]
   },
   {
     path: 'signup',
-    loadComponent: () => import('./components/signup/signup.component'),
+    loadComponent: () => import('@/src/components/auth/signup/signup.component'),
     canActivate: [guestGuard]
   },
   {
     path: 'entries',
-    loadComponent: () => import('./components/entries/entries.component'),
+    loadComponent: () => import('@/src/components/sections-page/entries/entry/entries.component'),
     canActivate: [authGuard],
   },
   {
@@ -24,18 +24,18 @@ export const routes: Routes = [
     children: [
       {
         path: '',
-        loadComponent: () => import('./components/projects/projects.component'),
+        loadComponent: () => import('@/src/components/sections-page/project/projects/projects.component'),
         pathMatch: 'full'
       },
       {
         path: ':id',
-        loadComponent: () => import('./components/project-detail/project-detail.component'),
+        loadComponent: () => import('@/src/components/sections-page/project/project-detail/project-detail.component'),
       }
     ]
   },
   {
     path: 'calendar',
-    loadComponent: () => import('./components/calendar/calendar.component'),
+    loadComponent: () => import('@/src/components/sections-page/calendar/calendar/calendar.component'),
     canActivate: [authGuard],
   },
   {

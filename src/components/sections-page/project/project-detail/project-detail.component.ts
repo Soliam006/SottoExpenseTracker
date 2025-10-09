@@ -2,15 +2,16 @@ import { Component, ChangeDetectionStrategy, inject, signal, computed, effect, u
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
-import { DataService } from '../../services/data.service';
-import { Project } from '../../models/project.model';
-import { Entry } from '../../models/entry.model';
-import { CloudinaryService } from '../../services/cloudinary.service';
+import { DataService } from '../../../../services/data.service';
+import { Project } from '../../../../models/project.model';
+import { Entry } from '../../../../models/entry.model';
+import { CloudinaryService } from '../../../../services/cloudinary.service';
+import {TranslatePipe} from "@/src/shared/pipes/translate.pipe";
 
 @Component({
   selector: 'app-project-detail',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterLink],
+    imports: [CommonModule, ReactiveFormsModule, RouterLink, TranslatePipe],
   templateUrl: './project-detail.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

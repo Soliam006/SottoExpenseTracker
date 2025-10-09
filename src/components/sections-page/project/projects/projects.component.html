@@ -1,0 +1,85 @@
+<div class="p-4 sm:p-6 lg:p-8">
+    <div class="flex justify-between items-center mb-6">
+        <h2 class="text-2xl font-bold text-gray-800">{{ 'projects.title' | translate }}</h2>
+        <button (click)="openModal()" class="flex items-center bg-indigo-600 text-white px-4 py-2 rounded-lg shadow-md hover:bg-indigo-700 transition-colors duration-200">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
+            </svg>
+            {{ 'projects.add' | translate }}
+        </button>
+    </div>
+
+    @if (projects().length === 0) {
+        <div class="text-center py-12 bg-white rounded-lg shadow">
+            <p class="text-gray-500">{{ 'projects.empty' | translate }}</p>
+        </div>
+    } @else {
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            @for (project of projects(); track project.id) {
+                <a [routerLink]="['/projects', project.id]" class="block bg-white rounded-lg shadow-lg overflow-hidden transform hover:-translate-y-1 transition-transform duration-300">
+                    @if (project.imagePublicId) {
+                        <img [src]="getProjectImageUrl(project.imagePublicId)" [alt]="project.name" class="h-48 w-full object-cover">
+                    } @else {
+                        <div class="h-48 w-full bg-gray-200 flex items-center justify-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            </svg>
+                        </div>
+                    }
+                    <div class="p-6">
+                        <h3 class="text-xl font-semibold text-gray-900 mb-2">{{ project.name }}</h3>
+                        <p class="text-gray-600 mb-1"><span class="font-medium">{{ 'projects.client' | translate }}:</span> {{ project.client }}</p>
+                        <p class="text-gray-600 mb-1"><span class="font-medium">{{ 'projects.address' | translate }}:</span> {{ project.address }}</p>
+                        <p class="text-gray-600"><span class="font-medium">{{ 'projects.mobile' | translate }}:</span> {{ project.mobile }}</p>
+                    </div>
+                </a>
+            }
+        </div>
+    }
+</div>
+
+<!-- Modal -->
+@if (isModalOpen()) {
+    <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-white rounded-lg shadow-2xl p-8 w-full max-w-md mx-4">
+            <h3 class="text-2xl font-bold mb-6">{{ (editingProject() ? 'projects.modal.edit_title' : 'projects.modal.add_title') | translate }}</h3>
+            <form [formGroup]="projectForm" (ngSubmit)="saveProject()">
+                <div class="space-y-4">
+                    <div>
+                        <label for="name" class="block text-sm font-medium text-gray-700">{{ 'projects.modal.name' | translate }}</label>
+                        <input id="name" type="text" formControlName="name" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                    </div>
+                    <div>
+                        <label for="client" class="block text-sm font-medium text-gray-700">{{ 'projects.modal.client' | translate }}</label>
+                        <input id="client" type="text" formControlName="client" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                    </div>
+                    <div>
+                        <label for="address" class="block text-sm font-medium text-gray-700">{{ 'projects.modal.address' | translate }}</label>
+                        <input id="address" type="text" formControlName="address" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                    </div>
+                    <div>
+                        <label for="mobile" class="block text-sm font-medium text-gray-700">{{ 'projects.modal.mobile' | translate }}</label>
+                        <input id="mobile" type="text" formControlName="mobile" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                    </div>
+                    <div>
+                        <label for="projectImage" class="block text-sm font-medium text-gray-700">{{ 'projects.modal.image' | translate }}</label>
+                        @if (imagePreview()) {
+                            <div class="mt-2 relative group">
+                                <img [src]="imagePreview()" alt="Project Preview" class="rounded-lg shadow-sm object-cover h-40 w-full">
+                                <button (click)="removeImage()" type="button" class="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 h-6 w-6 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                                </button>
+                            </div>
+                        } @else {
+                            <input id="projectImage" type="file" (change)="onFileChange($event)" accept="image/*" class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100">
+                        }
+                    </div>
+                </div>
+                <div class="mt-8 flex justify-end space-x-3">
+                    <button type="button" (click)="closeModal()" class="bg-gray-200 text-gray-800 px-4 py-2 rounded-md hover:bg-gray-300">{{ 'entries.modal.cancel' | translate }}</button>
+                    <button type="submit" [disabled]="projectForm.invalid" class="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 disabled:bg-indigo-300">{{ 'projects.modal.save' | translate }}</button>
+                </div>
+            </form>
+        </div>
+    </div>
+}

@@ -1,0 +1,155 @@
+<div class="p-4 sm:p-6 lg:p-8">
+    <div class="flex justify-between items-center mb-6">
+        <h2 class="text-2xl font-bold text-gray-800">{{ 'entries.title' | translate }}</h2>
+        <button (click)="openModal()" class="flex items-center bg-indigo-600 text-white px-4 py-2 rounded-lg shadow-md hover:bg-indigo-700 transition-colors duration-200">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" /></svg>
+            {{ 'entries.add' | translate }}
+        </button>
+    </div>
+
+    <!-- Filter Section -->
+    <div class="mb-6 bg-white p-4 rounded-lg shadow-md">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+            <div>
+                <label for="filter-type" class="block text-sm font-medium text-gray-700">{{ 'entries.filter_type' | translate }}</label>
+                <select id="filter-type" (change)="filterType.set($any($event.target).value)" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                    <option value="all">{{ 'entries.all_types' | translate }}</option>
+                    <option value="receipt">{{ 'entries.receipt' | translate }}</option>
+                    <option value="expense">{{ 'entries.expense' | translate }}</option>
+                </select>
+            </div>
+            <div>
+                <label for="filter-project" class="block text-sm font-medium text-gray-700">{{ 'entries.filter_project' | translate }}</label>
+                <select id="filter-project" (change)="filterProject.set($any($event.target).value)" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                    <option value="all">{{ 'entries.all_projects' | translate }}</option>
+                    @for (project of projects(); track project.id) {
+                        <option [value]="project.id">{{ project.name }}</option>
+                    }
+                </select>
+            </div>
+            <div>
+                <label for="filter-month" class="block text-sm font-medium text-gray-700">{{ 'entries.filter_month' | translate }}</label>
+                <select id="filter-month" (change)="filterMonth.set($any($event.target).value)" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                    <option value="all">{{ 'entries.all_months' | translate }}</option>
+                    @for (month of availableMonths(); track month) {
+                        <option [value]="month">{{ formatMonth(month) }}</option>
+                    }
+                </select>
+            </div>
+            <div class="text-right">
+                <label class="block text-sm font-medium text-gray-700">{{ 'entries.filtered_total' | translate }}</label>
+                <p class="text-2xl font-bold text-indigo-600 mt-1">{{ filteredTotal() | currency:'EUR':'symbol' }}</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="bg-white rounded-lg shadow-md overflow-x-auto">
+        <table class="w-full text-left">
+            <thead class="bg-gray-50">
+            <tr>
+                <th class="p-4 font-semibold text-sm text-gray-600">{{ 'entries.table.date' | translate }}</th>
+                <th class="p-4 font-semibold text-sm text-gray-600">{{ 'entries.table.type' | translate }}</th>
+                <th class="p-4 font-semibold text-sm text-gray-600">{{ 'entries.table.description' | translate }}</th>
+                <th class="p-4 font-semibold text-sm text-gray-600">{{ 'entries.table.project' | translate }}</th>
+                <th class="p-4 font-semibold text-sm text-gray-600 text-right">{{ 'entries.table.amount' | translate }}</th>
+                <th class="p-4 font-semibold text-sm text-gray-600 text-center">{{ 'entries.table.actions' | translate }}</th>
+            </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-200">
+                @for (entry of enrichedEntries(); track entry.id) {
+                    <tr>
+                        <td class="p-4 whitespace-nowrap">{{ entry.date }}</td>
+                        <td class="p-4 whitespace-nowrap">
+                            <span [class]="entry.type === 'receipt' ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800'" class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full capitalize">{{ (entry.type === 'receipt' ? 'entries.receipt' : 'entries.expense') | translate }}</span>
+                        </td>
+                        <td class="p-4 whitespace-nowrap text-gray-800">{{ entry.description }}</td>
+                        <td class="p-4 whitespace-nowrap text-gray-500">{{ entry.projectName }}</td>
+                        <td class="p-4 whitespace-nowrap text-right font-medium text-gray-900">{{ entry.price | currency }}</td>
+                        <td class="p-4 whitespace-nowrap text-center space-x-2">
+                            <button (click)="openModal(entry)" class="text-indigo-600 hover:text-indigo-800 font-medium">{{ 'entries.table.edit' | translate }}</button>
+                            <button (click)="deleteEntry(entry.id)" class="text-red-600 hover:text-red-800 font-medium">{{ 'entries.table.delete' | translate }}</button>
+                        </td>
+                    </tr>
+                } @empty {
+                    <tr>
+                        <td colspan="6" class="text-center p-8 text-gray-500">{{ 'entries.empty' | translate }}</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Modal -->
+@if (isModalOpen()) {
+    <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-white rounded-lg shadow-2xl p-8 w-full max-w-lg mx-4">
+            <h3 class="text-2xl font-bold mb-6">{{ (editingEntry() ? 'entries.modal.edit_title' : 'entries.modal.add_title') | translate }}</h3>
+            <form [formGroup]="entryForm" (ngSubmit)="saveEntry()">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label for="type" class="block text-sm font-medium text-gray-700">{{ 'entries.modal.type' | translate }}</label>
+                        <select id="type" formControlName="type" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                            <option value="receipt">{{ 'entries.receipt' | translate }}</option>
+                            <option value="expense">{{ 'entries.expense' | translate }}</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="date" class="block text-sm font-medium text-gray-700">{{ 'entries.modal.date' | translate }}</label>
+                        <input id="date" type="date" formControlName="date" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                    </div>
+                    <div class="md:col-span-2">
+                        <label for="description" class="block text-sm font-medium text-gray-700">{{ 'entries.modal.description' | translate }}</label>
+                        <input id="description" type="text" formControlName="description" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                    </div>
+                    <div>
+                        <label for="price" class="block text-sm font-medium text-gray-700">{{ 'entries.modal.price' | translate }}</label>
+                        <input id="price" type="number" formControlName="price" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                    </div>
+                    <div>
+                        <label for="projectId" class="block text-sm font-medium text-gray-700">{{ 'entries.modal.project' | translate }}</label>
+                        <select id="projectId" formControlName="projectId" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                            <option value="">{{ 'entries.modal.project_none' | translate }}</option>
+                            @for (project of projects(); track project.id) {
+                                <option [value]="project.id">{{ project.name }}</option>
+                            }
+                        </select>
+                    </div>
+
+                    @if (isReceipt) {
+                        <div class="md:col-span-2">
+                            <label for="receiptImage" class="block text-sm font-medium text-gray-700">{{ 'entries.modal.photos' | translate }}</label>
+                            @if (existingReceiptImages().length + receiptImagePreviews().length < 3) {
+                                <input id="receiptImage" type="file" (change)="onFileChange($event)" accept="image/*" multiple class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100">
+                            }
+                            @if(existingReceiptImages().length > 0 || receiptImagePreviews().length > 0) {
+                                <div class="mt-4 grid grid-cols-3 gap-4">
+                                    @for (image of existingReceiptImages(); track image.publicId) {
+                                        <div class="relative group">
+                                            <img [src]="image.url" alt="Receipt Preview" class="rounded-lg shadow-sm object-cover h-24 w-full">
+                                            <button (click)="removeExistingImage(image.publicId)" type="button" class="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 h-6 w-6 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                                            </button>
+                                        </div>
+                                    }
+                                    @for (image of receiptImagePreviews(); track $index) {
+                                        <div class="relative group">
+                                            <img [src]="image" alt="Receipt Preview {{ $index + 1 }}" class="rounded-lg shadow-sm object-cover h-24 w-full">
+                                            <button (click)="removeNewImage($index)" type="button" class="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 h-6 w-6 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                                            </button>
+                                        </div>
+                                    }
+                                </div>
+                            }
+                        </div>
+                    }
+                </div>
+                <div class="mt-8 flex justify-end space-x-3">
+                    <button type="button" (click)="closeModal()" class="bg-gray-200 text-gray-800 px-4 py-2 rounded-md hover:bg-gray-300">{{ 'entries.modal.cancel' | translate }}</button>
+                    <button type="submit" [disabled]="entryForm.invalid" class="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 disabled:bg-indigo-300">{{ 'entries.modal.save' | translate }}</button>
+                </div>
+            </form>
+        </div>
+    </div>
+}
