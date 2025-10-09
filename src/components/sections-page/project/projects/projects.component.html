@@ -44,6 +44,10 @@
         <div class="bg-white rounded-lg shadow-2xl p-8 w-full max-w-md mx-4">
             <h3 class="text-2xl font-bold mb-6">{{ (editingProject() ? 'projects.modal.edit_title' : 'projects.modal.add_title') | translate }}</h3>
             <form [formGroup]="projectForm" (ngSubmit)="saveProject()">
+                <div class="mt-8 flex justify-start space-x-3  pb-2 md:pb-8">
+                    <button type="button" (click)="closeModal()" class="bg-gray-200 text-gray-800 px-4 py-2 rounded-md hover:bg-gray-300">{{ 'entries.modal.cancel' | translate }}</button>
+                    <button type="submit" [disabled]="projectForm.invalid" class="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 disabled:bg-indigo-300">{{ 'projects.modal.save' | translate }}</button>
+                </div>
                 <div class="space-y-4">
                     <div>
                         <label for="name" class="block text-sm font-medium text-gray-700">{{ 'projects.modal.name' | translate }}</label>
@@ -74,10 +78,6 @@
                             <input id="projectImage" type="file" (change)="onFileChange($event)" accept="image/*" class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100">
                         }
                     </div>
-                </div>
-                <div class="mt-8 flex justify-end space-x-3">
-                    <button type="button" (click)="closeModal()" class="bg-gray-200 text-gray-800 px-4 py-2 rounded-md hover:bg-gray-300">{{ 'entries.modal.cancel' | translate }}</button>
-                    <button type="submit" [disabled]="projectForm.invalid" class="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 disabled:bg-indigo-300">{{ 'projects.modal.save' | translate }}</button>
                 </div>
             </form>
         </div>

@@ -86,6 +86,10 @@
         <div class="bg-white rounded-lg shadow-2xl p-8 w-full max-w-lg mx-4">
             <h3 class="text-2xl font-bold mb-6">{{ (editingEntry() ? 'entries.modal.edit_title' : 'entries.modal.add_title') | translate }}</h3>
             <form [formGroup]="entryForm" (ngSubmit)="saveEntry()">
+                <div class="mt-8 flex justify-start space-x-3 pb-2 md:pb-8">
+                    <button type="button" (click)="closeModal()" class="bg-gray-200 text-gray-800 px-4 py-2 rounded-md hover:bg-gray-300">{{ 'entries.modal.cancel' | translate }}</button>
+                    <button type="submit" [disabled]="entryForm.invalid" class="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 disabled:bg-indigo-300">{{ 'entries.modal.save' | translate }}</button>
+                </div>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                         <label for="type" class="block text-sm font-medium text-gray-700">{{ 'entries.modal.type' | translate }}</label>
@@ -144,10 +148,6 @@
                             }
                         </div>
                     }
-                </div>
-                <div class="mt-8 flex justify-end space-x-3">
-                    <button type="button" (click)="closeModal()" class="bg-gray-200 text-gray-800 px-4 py-2 rounded-md hover:bg-gray-300">{{ 'entries.modal.cancel' | translate }}</button>
-                    <button type="submit" [disabled]="entryForm.invalid" class="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 disabled:bg-indigo-300">{{ 'entries.modal.save' | translate }}</button>
                 </div>
             </form>
         </div>
