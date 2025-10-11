@@ -46,7 +46,10 @@
             <form [formGroup]="projectForm" (ngSubmit)="saveProject()">
                 <div class="mt-8 flex justify-start space-x-3  pb-2 md:pb-8">
                     <button type="button" (click)="closeModal()" class="bg-gray-200 text-gray-800 px-4 py-2 rounded-md hover:bg-gray-300">{{ 'entries.modal.cancel' | translate }}</button>
-                    <button type="submit" [disabled]="projectForm.invalid" class="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 disabled:bg-indigo-300">{{ 'projects.modal.save' | translate }}</button>
+                    <button type="submit" [disabled]="projectForm.invalid || this.loadingState()"
+                            class="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 disabled:bg-indigo-300">
+                        {{ this.loadingState() ? ('entries.modal.loading' | translate) : ('projects.modal.save' | translate) }}
+                    </button>
                 </div>
                 <div class="space-y-4">
                     <div>

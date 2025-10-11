@@ -32,6 +32,8 @@ export default class ProjectsComponent {
     mobile: ['', Validators.required],
   });
 
+  loadingState= signal(false); // Loading state for save operation
+
   openModal(project: Project | null = null) {
     this.editingProject.set(project);
     if (project) {
@@ -91,6 +93,8 @@ export default class ProjectsComponent {
       return;
     }
 
+
+    this.loadingState.set(true); // Set loading state to true at the start of the operation
     let imagePublicId: string | undefined = this.editingProject()?.imagePublicId;
     const preview = this.imagePreview();
     
@@ -108,7 +112,7 @@ export default class ProjectsComponent {
           client: formValue.client!,
           address: formValue.address!,
           mobile: formValue.mobile!,
-          imagePublicId: imagePublicId,
+          imagePublicId: imagePublicId || null,
       };
       
       const currentProject = this.editingProject();
@@ -122,6 +126,8 @@ export default class ProjectsComponent {
     } catch (error) {
         console.error("Error saving project:", error);
         alert("There was an error saving the project. Please try again.");
+    } finally {
+        this.loadingState.set(false); // Reset loading state at the end of the operation
     }
   }
 
