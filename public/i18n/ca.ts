@@ -57,6 +57,7 @@ export const ca = {
     'entries.modal.project': 'Projecte (Opcional)',
     'entries.modal.project_none': 'Cap',
     'entries.modal.photos': 'Fotos del Rebut (fins a 3)',
+    'entries.modal.loading': 'Carregant...',
     'entries.modal.save': 'Desa',
     'entries.modal.cancel': 'Cancel·la',
     'entries.delete_confirm': 'Estàs segur que vols eliminar aquesta entrada?',

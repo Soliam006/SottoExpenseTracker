@@ -43,41 +43,14 @@
         </div>
     </div>
 
-    <div class="bg-white rounded-lg shadow-md overflow-x-auto">
-        <table class="w-full text-left">
-            <thead class="bg-gray-50">
-            <tr>
-                <th class="p-4 font-semibold text-sm text-gray-600">{{ 'entries.table.date' | translate }}</th>
-                <th class="p-4 font-semibold text-sm text-gray-600">{{ 'entries.table.type' | translate }}</th>
-                <th class="p-4 font-semibold text-sm text-gray-600">{{ 'entries.table.description' | translate }}</th>
-                <th class="p-4 font-semibold text-sm text-gray-600">{{ 'entries.table.project' | translate }}</th>
-                <th class="p-4 font-semibold text-sm text-gray-600 text-right">{{ 'entries.table.amount' | translate }}</th>
-                <th class="p-4 font-semibold text-sm text-gray-600 text-center">{{ 'entries.table.actions' | translate }}</th>
-            </tr>
-            </thead>
-            <tbody class="divide-y divide-gray-200">
-                @for (entry of enrichedEntries(); track entry.id) {
-                    <tr>
-                        <td class="p-4 whitespace-nowrap">{{ entry.date }}</td>
-                        <td class="p-4 whitespace-nowrap">
-                            <span [class]="entry.type === 'receipt' ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800'" class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full capitalize">{{ (entry.type === 'receipt' ? 'entries.receipt' : 'entries.expense') | translate }}</span>
-                        </td>
-                        <td class="p-4 whitespace-nowrap text-gray-800">{{ entry.description }}</td>
-                        <td class="p-4 whitespace-nowrap text-gray-500">{{ entry.projectName }}</td>
-                        <td class="p-4 whitespace-nowrap text-right font-medium text-gray-900">{{ entry.price | currency }}</td>
-                        <td class="p-4 whitespace-nowrap text-center space-x-2">
-                            <button (click)="openModal(entry)" class="text-indigo-600 hover:text-indigo-800 font-medium">{{ 'entries.table.edit' | translate }}</button>
-                            <button (click)="deleteEntry(entry.id)" class="text-red-600 hover:text-red-800 font-medium">{{ 'entries.table.delete' | translate }}</button>
-                        </td>
-                    </tr>
-                } @empty {
-                    <tr>
-                        <td colspan="6" class="text-center p-8 text-gray-500">{{ 'entries.empty' | translate }}</td>
-                    </tr>
-                }
-            </tbody>
-        </table>
+    <div class="bg-white rounded-lg shadow-md overflow-y-auto max-h-[70vh]">
+        <entry-card
+                [entries]="enrichedEntries()"
+                (edit)="openModal($event)"
+                (delete)="deleteEntry($event)">
+        </entry-card>
     </div>
+
 </div>
 
 <!-- Modal -->
@@ -88,7 +61,10 @@
             <form [formGroup]="entryForm" (ngSubmit)="saveEntry()">
                 <div class="mt-8 flex justify-start space-x-3 pb-2 md:pb-8">
                     <button type="button" (click)="closeModal()" class="bg-gray-200 text-gray-800 px-4 py-2 rounded-md hover:bg-gray-300">{{ 'entries.modal.cancel' | translate }}</button>
-                    <button type="submit" [disabled]="entryForm.invalid" class="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 disabled:bg-indigo-300">{{ 'entries.modal.save' | translate }}</button>
+                    <button type="submit" [disabled]="entryForm.invalid || this.loadingButton()"
+                            class="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 disabled:bg-indigo-300">
+                        {{ this.loadingButton() ? ('entries.modal.loading' | translate) : ('entries.modal.save' | translate) }}
+                    </button>
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>

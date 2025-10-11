@@ -57,6 +57,7 @@ export const es = {
     'entries.modal.project': 'Proyecto (Opcional)',
     'entries.modal.project_none': 'Ninguno',
     'entries.modal.photos': 'Fotos del Recibo (hasta 3)',
+    'entries.modal.loading': 'Cargando...',
     'entries.modal.save': 'Guardar',
     'entries.modal.cancel': 'Cancelar',
     'entries.delete_confirm': '¿Estás seguro de que quieres eliminar esta entrada?',

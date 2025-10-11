@@ -5,11 +5,12 @@ import { DataService } from '../../../../services/data.service';
 import { Entry } from '../../../../models/entry.model';
 import { CloudinaryService } from '../../../../services/cloudinary.service';
 import {TranslatePipe} from "@/src/shared/pipes/translate.pipe";
+import {EntryCard} from "@/src/components/sections-page/entries/entry/entry-card/entry-card";
 
 @Component({
   selector: 'app-entries',
   standalone: true,
-    imports: [CommonModule, ReactiveFormsModule, TranslatePipe],
+    imports: [CommonModule, ReactiveFormsModule, TranslatePipe, EntryCard],
   templateUrl: './entries.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -23,6 +24,7 @@ export default class EntriesComponent {
   projects = this.dataService.projects;
   isModalOpen = signal(false);
   editingEntry = signal<Entry | null>(null);
+  loadingButton = signal(false);
   
   // Image states
   receiptImagePreviews = signal<string[]>([]); // holds base64 strings for new images
@@ -89,6 +91,7 @@ export default class EntriesComponent {
   }
 
   openModal(entry: Entry | null = null) {
+
     this.editingEntry.set(entry);
     this.receiptImagePreviews.set([]);
     this.existingReceiptImages.set([]);
@@ -175,6 +178,8 @@ export default class EntriesComponent {
     if (this.entryForm.invalid) {
       return;
     }
+
+      this.loadingButton.set(true); // Stop multiple clicks
     try {
         const uploadPromises = this.receiptImagePreviews().map(base64 => this.cloudinaryService.uploadImage(base64));
         const newUploads = await Promise.all(uploadPromises);
@@ -211,6 +216,8 @@ export default class EntriesComponent {
     } catch (error) {
         console.error("Error saving entry:", error);
         alert("There was an error saving the entry. Please try again.");
+    } finally {
+        this.loadingButton.set(false);
     }
   }
 

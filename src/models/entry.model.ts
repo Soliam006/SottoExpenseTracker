@@ -7,3 +7,7 @@ export interface Entry {
   receiptImagePublicIds?: string[]; // array of cloudinary public_ids
   description: string;
 }
+
+export interface EnrichedEntry extends Entry {
+    projectName: string;
+}
