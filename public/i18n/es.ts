@@ -71,6 +71,16 @@ export const es = {
     'entries.modal.cancel': 'Cancelar',
     'entries.delete_confirm': '¿Estás seguro de que quieres eliminar esta entrada?',
 
+    // PDF Export
+    'export.pdf.title': 'Confirmar exportación',
+    'export.pdf.message': 'El proyecto <b>{project}</b> será exportado en formato PDF.<br><br><strong>Solo los recibos con imágenes</strong> aparecerán en el documento.<br><br>¿Desea continuar con la exportación?',
+    'export.pdf.confirm': 'Sí, exportar',
+    'export.pdf.cancel': 'Cancelar',
+    'export.pdf.success.title': 'Exportación completada',
+    'export.pdf.success.text': 'El PDF se ha generado correctamente.',
+    'export.pdf.error.title': 'Error al exportar',
+    'export.pdf.error.text': 'Ocurrió un error al generar el PDF.',
+
     // Projects
     'projects.title': 'Proyectos',
     'projects.add': 'Añadir Proyecto',
@@ -102,6 +112,7 @@ export const es = {
     'project_detail.modal.delete_confirm_prompt': 'Para confirmar, por favor escribe',
     'project_detail.modal.delete_confirm_prompt_2': 'a continuación:',
     'project_detail.modal.delete_button': 'Eliminar Proyecto',
+    'project_detail.export_pdf': 'Exportar PDF',
 
     // Calendar
     'calendar.title': 'Calendario de Entradas',

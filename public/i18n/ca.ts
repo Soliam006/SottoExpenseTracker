@@ -71,6 +71,16 @@ export const ca = {
     'entries.modal.cancel': 'Cancel·la',
     'entries.delete_confirm': 'Estàs segur que vols eliminar aquesta entrada?',
 
+    //Exportar PDF
+    'export.pdf.title': 'Confirmar exportació',
+    'export.pdf.message': 'El projecte <b>{project}</b> s\'exportarà en format PDF.<br><br><strong>Només els rebuts amb imatges</strong> apareixeran al document.<br><br>Vols continuar amb l\'exportació?',
+    'export.pdf.confirm': 'Sí, exportar',
+    'export.pdf.cancel': 'Cancel·lar',
+    'export.pdf.success.title': 'Exportació completada',
+    'export.pdf.success.text': 'El PDF s\'ha generat correctament.',
+    'export.pdf.error.title': 'Error en exportar',
+    'export.pdf.error.text': 'S\'ha produït un error en generar el PDF.',
+
     // Projects
     'projects.title': 'Projectes',
     'projects.add': 'Afegeix Projecte',
@@ -102,6 +112,7 @@ export const ca = {
     'project_detail.modal.delete_confirm_prompt': 'Per confirmar, si us plau, escriu',
     'project_detail.modal.delete_confirm_prompt_2': 'a continuació:',
     'project_detail.modal.delete_button': 'Elimina el Projecte',
+    'project_detail.export_pdf': 'Exportar PDF',
 
     // Calendar
     'calendar.title': 'Calendari d\'Entrades',

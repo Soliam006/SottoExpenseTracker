@@ -19,7 +19,9 @@
     "@angular/forms": "^20.3.3",
     "@angular/platform-browser": "^20.3.0",
     "@angular/router": "^20.3.4",
+    "jspdf": "^3.0.3",
     "rxjs": "^7.8.2",
+    "sweetalert2": "^11.26.2",
     "tailwindcss": "latest"
   },
   "devDependencies": {

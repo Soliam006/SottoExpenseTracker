@@ -71,6 +71,16 @@ export const en = {
     'entries.modal.cancel': 'Cancel',
     'entries.delete_confirm': 'Are you sure you want to delete this entry?',
 
+    // PDF Export
+    'export.pdf.title': 'Confirm export',
+    'export.pdf.message': 'The project <b>{project}</b> will be exported as a PDF.<br><br><strong>Only receipts with images</strong> will appear in the document.<br><br>Do you want to continue?',
+    'export.pdf.confirm': 'Yes, export',
+    'export.pdf.cancel': 'Cancel',
+    'export.pdf.success.title': 'Export completed',
+    'export.pdf.success.text': 'The PDF has been generated successfully.',
+    'export.pdf.error.title': 'Export error',
+    'export.pdf.error.text': 'An error occurred while generating the PDF.',
+
     // Projects
     'projects.title': 'Projects',
     'projects.add': 'Add Project',
@@ -102,6 +112,7 @@ export const en = {
     'project_detail.modal.delete_confirm_prompt': 'To confirm, please type',
     'project_detail.modal.delete_confirm_prompt_2': 'below:',
     'project_detail.modal.delete_button': 'Delete Project',
+    'project_detail.export_pdf': 'Export as PDF',
 
     // Calendar
     'calendar.title': 'Entries Calendar',

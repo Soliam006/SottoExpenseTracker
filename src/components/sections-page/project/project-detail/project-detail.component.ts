@@ -2,12 +2,14 @@ import { Component, ChangeDetectionStrategy, inject, signal, computed, effect, u
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
-import { DataService } from '../../../../services/data.service';
-import { Project } from '../../../../models/project.model';
-import { Entry } from '../../../../models/entry.model';
-import { CloudinaryService } from '../../../../services/cloudinary.service';
+import { DataService } from '@/src/services/data.service';
+import { Project } from '@/src/models/project.model';
+import { CloudinaryService } from '@/src/services/cloudinary.service';
 import {TranslatePipe} from "@/src/shared/pipes/translate.pipe";
 import {EntryView} from "@/src/components/sections-page/entries/entry/entry-view/entry-view";
+import {PdfExportService} from "@/src/services/pdf-export.service";
+import {ConfirmDialogService} from "@/src/services/confirm-dialog.service";
+import {LanguageService} from "@/src/core/services/language.service";
 
 @Component({
   selector: 'app-project-detail',
@@ -21,8 +23,42 @@ export default class ProjectDetailComponent {
   private router = inject(Router);
   private dataService = inject(DataService);
   private cloudinaryService = inject(CloudinaryService);
-  // FIX: Explicitly type `fb` to resolve TypeScript's incorrect type inference.
   private fb: FormBuilder = inject(FormBuilder);
+  private readonly confirmDialog = inject(ConfirmDialogService);
+
+  // PDF export logic
+  private pdfExportService = inject(PdfExportService);
+  // PDF Export state
+  isExportingPdf = signal(false);
+
+  // --- PDF Export Logic ---
+  private languageService = inject(LanguageService);
+
+  async exportReceiptsAsPdf() {
+    const p = this.project();
+    if (!p) return;
+    const t = (key: string) => this.languageService.get(key);
+
+    const confirmed = await this.confirmDialog.confirm({
+      title: t('export.pdf.title'),
+      html: t('export.pdf.message').replace('{project}', p.name),
+      confirmText: t('export.pdf.confirm'),
+      cancelText: t('export.pdf.cancel'),
+      icon: 'question',
+    });
+
+    if (!confirmed) return;
+
+    this.isExportingPdf.set(true);
+    try {
+      await this.pdfExportService.exportProjectReceiptsAsPdf(p, this.projectEntries());
+      await this.confirmDialog.success(t('export.pdf.success.title'), t('export.pdf.success.text'));
+    } catch (error) {
+      await this.confirmDialog.error(t('export.pdf.error.title'), t('export.pdf.error.text'));
+    } finally {
+      this.isExportingPdf.set(false);
+    }
+  }
 
   projectId = signal<string | null>(null);
 
@@ -137,8 +173,11 @@ export default class ProjectDetailComponent {
       this.imagePreview.set(null);
   }
 
+  isSaving: boolean;
   async saveProject() {
     if (this.projectForm.invalid) return;
+
+    this.isSaving = true;
     
     const p = this.project();
     if (!p) return;
@@ -168,6 +207,8 @@ export default class ProjectDetailComponent {
     } catch(error) {
         console.error("Error updating project:", error);
         alert("There was an error updating the project. Please try again.");
+    } finally {
+        this.isSaving = false;
     }
   }
   
@@ -184,6 +225,7 @@ export default class ProjectDetailComponent {
   async deleteProject() {
       const p = this.project();
       if (!p) return;
+      this.isSaving = true;
 
       const expectedConfirmation = `delete project ${p.name}`;
       const enteredConfirmation = this.deleteConfirmationForm.value.confirmationText?.trim();
@@ -195,9 +237,12 @@ export default class ProjectDetailComponent {
           } catch (error) {
               console.error("Error deleting project:", error);
               alert("There was an error deleting the project. Please try again.");
+          } finally {
+                this.isSaving = false;
           }
       } else {
           alert('Confirmation text does not match.');
+          this.isSaving = false;
       }
   }
 }
