@@ -1,16 +1,22 @@
 export const es = {
+    // LANG
+    'es': 'Español',
+    'en': 'Inglés',
+    'ca': 'Catalán',
+
     // Header
     'header.title': 'Seguimiento de Gastos de Construcción',
     'header.entries': 'Entradas',
     'header.projects': 'Proyectos',
     'header.calendar': 'Calendario',
+    'header.profile': 'Perfil',
     'header.logout': 'Cerrar sesión',
 
     // Language
     'language': 'Idioma',
-    'language.english': 'English',
+    'language.english': 'Inglés',
     'language.spanish': 'Español',
-    'language.catalan': 'Català',
+    'language.catalan': 'Catalán',
 
     // Login
     'login.title': 'Inicia sesión en tu cuenta',
@@ -26,6 +32,9 @@ export const es = {
     'signup.login_link': 'inicia sesión en tu cuenta existente',
     'signup.password_min_length': 'La contraseña debe tener al menos 6 caracteres.',
     'signup.button': 'Crear cuenta',
+
+    //Filter
+    'filters': 'Filtros',
 
     // Entries
     'entries.title': 'Entradas',

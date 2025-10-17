@@ -1,16 +1,22 @@
 export const en = {
+    // LANG
+    'es': 'Spanish',
+    'en': 'English',
+    'ca': 'Catalan',
+
     // Header
     'header.title': 'Construction Expense Tracker',
     'header.entries': 'Entries',
     'header.projects': 'Projects',
     'header.calendar': 'Calendar',
+    'header.profile': 'Profile',
     'header.logout': 'Logout',
 
     // Language
     'language': 'Language',
     'language.english': 'English',
-    'language.spanish': 'Español',
-    'language.catalan': 'Català',
+    'language.spanish': 'Spanish',
+    'language.catalan': 'Catalan',
 
     // Login
     'login.title': 'Log in to your account',
@@ -26,6 +32,9 @@ export const en = {
     'signup.login_link': 'log in to your existing account',
     'signup.password_min_length': 'Password must be at least 6 characters long.',
     'signup.button': 'Create account',
+
+    //Filter
+    'filters': 'Filters',
 
     // Entries
     'entries.title': 'Entries',

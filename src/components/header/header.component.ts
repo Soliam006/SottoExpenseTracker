@@ -17,9 +17,9 @@ export class HeaderComponent {
 
   isMobileMenuOpen = signal(false);
   isLangMenuOpen = signal(false);
+  isProfileMenuOpen = signal(false);
 
-
-  readonly languages = [
+    readonly languages = [
     { code: 'en', label: 'language.english' },
     { code: 'es', label: 'language.spanish' },
     { code: 'ca', label: 'language.catalan' },
@@ -36,7 +36,16 @@ export class HeaderComponent {
     this.isMobileMenuOpen.set(false);
   }
 
+  toggleProfileMenu() {
+        this.isProfileMenuOpen.update(v => !v);
+  }
+
   async logout() {
+        this.isProfileMenuOpen.set(false);
+        await this.authService.logout();
+  }
+
+  async logoutHeader() {
     this.closeMobileMenu();
     await this.authService.logout();
   }

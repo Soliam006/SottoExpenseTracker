@@ -13,10 +13,7 @@
                 6.43491 4.62904 6.83446 4.99999 7.19044C5.88743 6.33881 6.53369 5.23777 6.82607 4H0V2H4V0ZM12.5735 12L11.5 8.69688L10.4265
                 12H12.5735Z" fill="#ffffff"/>
         </svg>
-        <span class="ml-2">{{ currentLang() }}</span>
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-1" fill="currentColor" viewBox="0 0 20 20">
-            <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
-        </svg>
+        <span class="ml-2">{{ currentLang()  | translate   }}</span>
     </button>
 
     @if (isMenuOpen()) {

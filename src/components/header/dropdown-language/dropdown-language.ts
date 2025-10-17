@@ -1,4 +1,4 @@
-import {Component, computed, inject, output, signal} from '@angular/core';
+import {Component, computed, inject, input, output, signal} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {TranslatePipe} from "@/src/shared/pipes/translate.pipe";
 import {LanguageService} from "@/src/core/services/language.service";
@@ -12,7 +12,6 @@ import {LanguageService} from "@/src/core/services/language.service";
   templateUrl: './dropdown-language.html'
 })
 export class DropdownLanguage {
-
   private readonly translation = inject(LanguageService);
 
   readonly currentLang = computed(() => this.translation.currentLang());

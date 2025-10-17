@@ -1,15 +1,21 @@
 export const ca = {
+    // LANG
+    'es': 'Castellà',
+    'en': 'Anglès',
+    'ca': 'Català',
+
     // Header
     'header.title': 'Seguiment de Despeses de Construcció',
     'header.entries': 'Entrades',
     'header.projects': 'Projectes',
     'header.calendar': 'Calendari',
+    'header.profile': 'Perfil',
     'header.logout': 'Tanca la sessió',
 
     // Language
     'language': 'Idioma',
-    'language.english': 'English',
-    'language.spanish': 'Español',
+    'language.english': 'Anglès',
+    'language.spanish': 'Castellà',
     'language.catalan': 'Català',
 
     // Login
@@ -26,6 +32,9 @@ export const ca = {
     'signup.login_link': 'inicia sessió al teu compte existent',
     'signup.password_min_length': 'La contrasenya ha de tenir almenys 6 caràcters.',
     'signup.button': 'Crea un compte',
+
+    //Filter
+    'filters': 'Filtres',
 
     // Entries
     'entries.title': 'Entrades',
