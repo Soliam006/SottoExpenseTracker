@@ -3,7 +3,6 @@ import {en} from "@/public/i18n/en";
 import {es} from "@/public/i18n/es";
 import {ca} from "@/public/i18n/ca";
 
-
 export type Language = 'en' | 'es' | 'ca';
 type Translations = { [key: string]: string };
 
