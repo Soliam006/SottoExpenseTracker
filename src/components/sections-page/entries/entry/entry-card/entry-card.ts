@@ -4,7 +4,7 @@ import {TranslatePipe} from "@/src/shared/pipes/translate.pipe";
 import {EnrichedEntry} from "@/src/models/entry.model";
 
 @Component({
-  selector: 'entry-card',
+  selector: 'entries-card',
     imports: [
         CurrencyPipe,
         DatePipe,

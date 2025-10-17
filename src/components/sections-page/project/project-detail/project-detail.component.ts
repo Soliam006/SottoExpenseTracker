@@ -7,11 +7,12 @@ import { Project } from '../../../../models/project.model';
 import { Entry } from '../../../../models/entry.model';
 import { CloudinaryService } from '../../../../services/cloudinary.service';
 import {TranslatePipe} from "@/src/shared/pipes/translate.pipe";
+import {EntryView} from "@/src/components/sections-page/entries/entry/entry-view/entry-view";
 
 @Component({
   selector: 'app-project-detail',
   standalone: true,
-    imports: [CommonModule, ReactiveFormsModule, RouterLink, TranslatePipe],
+    imports: [CommonModule, ReactiveFormsModule, RouterLink, TranslatePipe, EntryView],
   templateUrl: './project-detail.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

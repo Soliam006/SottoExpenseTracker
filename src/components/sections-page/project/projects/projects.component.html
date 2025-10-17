@@ -1,4 +1,4 @@
-<div class="p-4 sm:p-6 lg:p-8 mb-20 md:mb-0">
+<div class="p-4 lg:p-8">
     <div class="flex justify-between items-center mb-6">
         <h2 class="text-2xl font-bold text-gray-800">{{ 'projects.title' | translate }}</h2>
         <button (click)="openModal()" class="flex items-center bg-indigo-600 text-white px-4 py-2 rounded-lg shadow-md hover:bg-indigo-700 transition-colors duration-200">
@@ -14,26 +14,29 @@
             <p class="text-gray-500">{{ 'projects.empty' | translate }}</p>
         </div>
     } @else {
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            @for (project of projects(); track project.id) {
-                <a [routerLink]="['/projects', project.id]" class="block bg-white rounded-lg shadow-lg overflow-hidden transform hover:-translate-y-1 transition-transform duration-300">
-                    @if (project.imagePublicId) {
-                        <img [src]="getProjectImageUrl(project.imagePublicId)" [alt]="project.name" class="h-48 w-full object-cover">
-                    } @else {
-                        <div class="h-48 w-full bg-gray-200 flex items-center justify-center">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                            </svg>
+        <div class="overflow-y-auto max-h-[80vh] mb-20 p-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                @for (project of projects(); track project.id) {
+                    <a [routerLink]="['/projects', project.id]"
+                       class="block bg-white rounded-lg shadow-md overflow-hidden transform hover:-translate-y-1 transition-transform duration-300">
+                        @if (project.imagePublicId) {
+                            <img [src]="getProjectImageUrl(project.imagePublicId)" [alt]="project.name" class="h-48 w-full object-cover">
+                        } @else {
+                            <div class="h-48 w-full bg-gray-200 flex items-center justify-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                </svg>
+                            </div>
+                        }
+                        <div class="p-6">
+                            <h3 class="text-xl font-semibold text-gray-900 mb-2">{{ project.name }}</h3>
+                            <p class="text-gray-600 mb-1"><span class="font-medium">{{ 'projects.client' | translate }}:</span> {{ project.client }}</p>
+                            <p class="text-gray-600 mb-1"><span class="font-medium">{{ 'projects.address' | translate }}:</span> {{ project.address }}</p>
+                            <p class="text-gray-600"><span class="font-medium">{{ 'projects.mobile' | translate }}:</span> {{ project.mobile }}</p>
                         </div>
-                    }
-                    <div class="p-6">
-                        <h3 class="text-xl font-semibold text-gray-900 mb-2">{{ project.name }}</h3>
-                        <p class="text-gray-600 mb-1"><span class="font-medium">{{ 'projects.client' | translate }}:</span> {{ project.client }}</p>
-                        <p class="text-gray-600 mb-1"><span class="font-medium">{{ 'projects.address' | translate }}:</span> {{ project.address }}</p>
-                        <p class="text-gray-600"><span class="font-medium">{{ 'projects.mobile' | translate }}:</span> {{ project.mobile }}</p>
-                    </div>
-                </a>
-            }
+                    </a>
+                }
+            </div>
         </div>
     }
 </div>

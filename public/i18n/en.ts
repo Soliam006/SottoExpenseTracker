@@ -104,6 +104,7 @@ export const en = {
     'project_detail.modal.delete_button': 'Delete Project',
 
     // Calendar
+    'calendar.title': 'Entries Calendar',
     'calendar.monthly_total': 'Monthly Total',
     'calendar.modal.title': 'Entries for',
     'calendar.modal.empty': 'No entries for this day.',

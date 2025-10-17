@@ -104,6 +104,7 @@ export const ca = {
     'project_detail.modal.delete_button': 'Elimina el Projecte',
 
     // Calendar
+    'calendar.title': 'Calendari d\'Entrades',
     'calendar.monthly_total': 'Total Mensual',
     'calendar.modal.title': 'Entrades per a',
     'calendar.modal.empty': 'No hi ha entrades per a aquest dia.',

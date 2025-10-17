@@ -50,11 +50,11 @@
     </div>
 
     <div class="bg-white rounded-lg shadow-md overflow-y-auto max-h-[70vh]">
-        <entry-card
+        <entries-card
                 [entries]="enrichedEntries()"
                 (edit)="openModal($event)"
                 (delete)="deleteEntry($event)">
-        </entry-card>
+        </entries-card>
     </div>
 
 </div>
