@@ -143,7 +143,7 @@ export default class ProjectDetailComponent {
     const p = this.project();
     if (!p) return;
 
-    let imagePublicId: string | undefined = p.imagePublicId;
+    let imagePublicId: string | null = p.imagePublicId;
     const preview = this.imagePreview();
 
     try {
@@ -151,7 +151,7 @@ export default class ProjectDetailComponent {
         const uploadResponse = await this.cloudinaryService.uploadImage(preview);
         imagePublicId = uploadResponse.public_id;
       } else if (!preview) {
-        imagePublicId = undefined;
+        imagePublicId = null;
       }
 
       const formValue = this.projectForm.value;
