@@ -34,6 +34,7 @@ export default class EntriesComponent {
   filterType = signal<'all' | 'receipt' | 'expense'>('all');
   filterProject = signal<string>('all');
   filterMonth = signal<string>('all');
+  isFilterVisibleOnMobile = signal(false);
 
   availableMonths = computed(() => {
     const entries = this.dataService.entries();
@@ -65,6 +66,11 @@ export default class EntriesComponent {
       }))
       .sort((a,b) => new Date(b.date).getTime() - new Date(a.date).getTime());
   });
+
+
+  toggleFilters() {
+    this.isFilterVisibleOnMobile.update(v => !v);
+  }
 
   filteredTotal = computed(() => {
     return this.enrichedEntries().reduce((total, entry) => total + entry.price, 0);
