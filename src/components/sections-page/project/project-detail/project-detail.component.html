@@ -105,7 +105,10 @@
                         </div>
                         <div class="mt-8 flex justify-end space-x-3">
                             <button type="button" (click)="closeEditModal()" class="bg-gray-200 text-gray-800 px-4 py-2 rounded-md hover:bg-gray-300">{{ 'entries.modal.cancel' | translate }}</button>
-                            <button type="submit" [disabled]="projectForm.invalid || isSaving" class="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 disabled:bg-indigo-300">{{ 'project_detail.modal.save' | translate }}</button>
+                            <button type="submit" [disabled]="projectForm.invalid || isSaving"
+                                    class="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 disabled:bg-indigo-300">
+                                {{ this.isSaving ? ('entries.modal.loading' | translate) : ('project_detail.modal.save'| translate) }}
+                            </button>
                         </div>
                     </form>
                 </div>
