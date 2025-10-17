@@ -30,6 +30,7 @@ export default class CalendarComponent {
   dataService = inject(DataService);
   cloudinaryService = inject(CloudinaryService);
   languageService = inject(LanguageService);
+  readonly locale = computed(() => this.languageService.currentLang() || 'en');
 
   viewDate = signal(new Date());
 

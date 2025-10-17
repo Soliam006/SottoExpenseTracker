@@ -9,7 +9,7 @@
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>
             </button>
             <div class="text-center">
-                <h2 class="text-2xl font-bold text-gray-800">{{ viewDate() | date:'MMMM yyyy' }}</h2>
+                <h2 class="text-2xl font-bold text-gray-800">{{ viewDate() | date:'MMMM yyyy':'':locale()| titlecase }}</h2>
                 <p class="text-lg font-semibold text-indigo-600">{{ 'calendar.monthly_total' | translate }}: {{ monthlyTotal() | currency }}</p>
             </div>
             <button (click)="changeMonth(1)" class="p-2 rounded-full hover:bg-gray-200 transition-colors">
@@ -28,7 +28,7 @@
                 <div
                         (click)="openDayModal(day)"
                         [class]="'relative pt-2 pb-8 px-2 border rounded-md transition-colors duration-200 ' +
-                   (day.isCurrentMonth ? 'bg-white' : 'bg-gray-50') + ' border-gray-200 ' +
+                   (day.isCurrentMonth ? 'bg-white' : 'bg-gray-200') + ' border-gray-200 ' +
                    (day.totalExpense > 0 ? 'cursor-pointer hover:bg-indigo-50' : 'cursor-default') +
                    (day.isToday ? ' ring-2 ring-indigo-500' : '')">
           <span [class]="'font-medium ' + (day.isCurrentMonth ? 'text-gray-800' : 'text-gray-400')">
